@@ -247,8 +247,12 @@ def _serialize_audio(val, artifacts, save, ctx):
     a = np.asarray(a)
     if a.ndim > 1:
         a = a.squeeze()
-        if a.ndim > 1:  # [C,N] → mono
-            a = a.mean(axis=0)
+        if a.ndim > 1:
+            # Down-mix multi-channel → mono. Audio time-axis is long, channel-axis
+            # is small (1/2/~8), so average over the SHORTER axis regardless of
+            # whether the layout is channels-first [C,N] or channels-last [N,C].
+            ch_axis = int(np.argmin(a.shape))
+            a = a.mean(axis=ch_axis)
     if not save:
         return {"type": "audio", "samples": int(a.size)}
     path = _save_wav(a, int(ctx.get("audio_sample_rate", 16000)))

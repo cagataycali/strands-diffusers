@@ -88,3 +88,16 @@ def test_modular_pipeline_run_gives_actionable_error():
     assert r["status"] == "error"
     txt = r["content"][0]["text"]
     assert "Modular" in txt and ("load_components" in txt or "action='call'" in txt)
+
+
+def test_stereo_audio_downmix_both_layouts():
+    """Stereo must down-mix over the CHANNEL axis (short), preserving the time
+    axis — for channels-first [C,N] AND channels-last [N,C]. Regression: [N,2]
+    once collapsed to 2 samples (averaged across time)."""
+    N = 16000
+    for shape in [(2, N), (N, 2), (1, N), (N,)]:
+        out = io.serialize_output(
+            type("AudioPipelineOutput", (), {"audio": np.random.randn(*shape)})(),
+            save_artifacts=False)
+        samples = out["result"]["audio"]["samples"]
+        assert samples == N, f"{shape} -> {samples} samples (expected {N})"
