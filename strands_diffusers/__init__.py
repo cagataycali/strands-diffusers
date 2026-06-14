@@ -25,7 +25,10 @@ Discovery (the agent never guesses):
     use_diffusers(action="inspect", target="StableDiffusionPipeline")
 """
 
-__version__ = "0.1.0"
+try:
+    from strands_diffusers._version import version as __version__
+except ImportError:  # not installed / no git metadata
+    __version__ = "0.1.0"
 
 from strands_diffusers.core import engine, io, registry
 from strands_diffusers.tools.use_diffusers import use_diffusers

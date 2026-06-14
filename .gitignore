@@ -15,3 +15,7 @@ system_prompt.prompt
 __pycache__/
 *.pyc
 .pytest_cache/
+strands_diffusers/_version.py
+build/
+.pytest_cache/
+__pycache__/

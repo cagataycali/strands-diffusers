@@ -1,10 +1,10 @@
 [build-system]
-requires = ["setuptools>=61.0", "wheel"]
+requires = ["setuptools>=61.0", "wheel", "setuptools-scm>=8"]
 build-backend = "setuptools.build_meta"
 
 [project]
 name = "strands-diffusers"
-version = "0.1.0"
+dynamic = ["version"]
 description = "The universal entrypoint to HuggingFace diffusers for Strands agents — 100% pipeline & modality coverage, zero hardcoding. Special focus on Physical-AI world-foundation models (Cosmos) with robot action outputs."
 readme = "README.md"
 requires-python = ">=3.10"
@@ -54,6 +54,11 @@ Issues = "https://github.com/cagataycali/strands-diffusers/issues"
 [tool.setuptools.packages.find]
 where = ["."]
 include = ["strands_diffusers*"]
+
+[tool.setuptools_scm]
+write_to = "strands_diffusers/_version.py"
+# Fallback for builds from a tarball with no git metadata.
+fallback_version = "0.1.0"
 
 [tool.ruff]
 line-length = 100
