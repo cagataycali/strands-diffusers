@@ -219,6 +219,21 @@ def resolve_attr(dotted: str, root_module: str = "diffusers") -> Any:
 def pipeline_info(name: str) -> Optional[Dict[str, Any]]:
     """Modality + __call__ signature for one pipeline class (lazily resolved)."""
     if name not in all_symbols():
+        # Known from-source WFM/pipeline classes (e.g. Cosmos3OmniPipeline ships in
+        # diffusers>0.38 from source). Degrade gracefully instead of erroring like a
+        # typo would — the tool resolves these dynamically once the install has them.
+        if re.search(r"Pipeline$", name) and re.search(
+                r"Cosmos|World|Wan|Hunyuan|Genie|Omni", name):
+            return {
+                "name": name,
+                "kind": "pipeline",
+                "modality": modality_of(name),
+                "available": False,
+                "note": (f"'{name}' is not in this diffusers build "
+                         "(likely a from-source >0.38 class). Install with: "
+                         "pip install 'git+https://github.com/huggingface/diffusers' "
+                         "— use_diffusers resolves it dynamically once present."),
+            }
         return None
     info: Dict[str, Any] = {
         "name": name,

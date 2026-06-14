@@ -37,3 +37,13 @@ def test_coverage_counts():
     assert len(r.world_foundation_models()) >= 10
     other = [p for p in r.pipelines() if r.modality_of(p)=="other"]
     assert len(other) < 60, f"too many unclassified: {len(other)}"
+
+
+def test_pipeline_info_soft_error_for_from_source_wfm():
+    """A known from-source WFM class degrades gracefully, not like a typo."""
+    info = r.pipeline_info("Cosmos3OmniPipeline")
+    assert info is not None, "from-source WFM should not return None (-> hard error)"
+    assert info["available"] is False
+    assert "from-source" in info["note"] or "diffusers" in info["note"]
+    # a genuine typo still returns None (-> hard error, correctly)
+    assert r.pipeline_info("DoesNotExistPipeline") is None
