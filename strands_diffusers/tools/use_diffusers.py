@@ -279,7 +279,7 @@ def use_diffusers(
             pipe, key = engine.get_pipeline(
                 pipeline, model, device=device, dtype=dtype,
                 cache_key=cache_key, **from_pretrained_kwargs)
-            call_kwargs = {k: _coerce_param(v) for k, v in params.items()}
+            call_kwargs = _coerce_kwargs(params)
             if inputs is not None:
                 call_args = [_coerce_param(inputs)]
             else:
@@ -303,7 +303,7 @@ def use_diffusers(
             obj = _resolve_target(target)
             if not callable(obj):
                 return _ok(f"📋 {target} = {str(obj)[:500]}", data=str(obj)[:2000])
-            coerced = {k: _coerce_param(v) for k, v in params.items()}
+            coerced = _coerce_kwargs(params)
             unpacked = coerced.pop("**", None)
             if unpacked is not None:
                 try:
@@ -359,6 +359,22 @@ def _resolve_target(target: str) -> Any:
             obj = getattr(obj, attr)
         return obj
     return registry.resolve_attr(target)
+
+
+_OUTPUT_PATH_KEYS = ("output_path", "output_video_path", "output_obj_path",
+                     "output_ply_path", "save_path", "out_path")
+
+
+def _coerce_kwargs(params: dict) -> dict:
+    """Coerce param values, but leave OUTPUT path keys untouched — coercing an
+    existing output path would load it as media (a subtle idempotency bug)."""
+    out = {}
+    for k, v in params.items():
+        if k in _OUTPUT_PATH_KEYS:
+            out[k] = v
+        else:
+            out[k] = _coerce_param(v)
+    return out
 
 
 def _coerce_param(value: Any) -> Any:

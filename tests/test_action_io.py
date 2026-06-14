@@ -158,3 +158,15 @@ def test_run_inputs_does_not_json_parse_strings():
     assert m._coerce_param("[[1,2,3]]") == "[[1,2,3]]"
     # real lists still pass through untouched
     assert m._coerce_param([[1, 2, 3]]) == [[1, 2, 3]]
+
+
+def test_output_path_not_coerced_idempotent(tmp_path):
+    """An EXISTING output-path string must not be coerced into loaded media.
+    Regression: a 2nd call with the same output_video_path failed because
+    coerce_input loaded the existing .mp4 as frames. Found via the usage gallery."""
+    import importlib
+    m = importlib.import_module("strands_diffusers.tools.use_diffusers")
+    out = str(tmp_path / "o.mp4")
+    open(out, "wb").write(b"fake-existing")  # path now exists
+    kw = m._coerce_kwargs({"video_frames": "ignore", "output_video_path": out})
+    assert kw["output_video_path"] == out, "output path must stay a string, not be loaded"
