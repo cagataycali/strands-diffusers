@@ -356,8 +356,15 @@ def _to_frame_list(val):
         Image = None
 
     if isinstance(val, (list, tuple)):
-        if Image and all(isinstance(x, Image.Image) for x in val):
+        if Image and val and all(isinstance(x, Image.Image) for x in val):
             return [np.asarray(x.convert("RGB")) for x in val]
+        # list of per-frame numpy arrays (a common pipeline return shape) → stack
+        if val and all(isinstance(x, np.ndarray) for x in val):
+            return _to_frame_list(np.stack(val))
+        # list of per-frame torch tensors → stack via numpy
+        a0 = _tensor_to_numpy(val[0]) if val else None
+        if a0 is not None and not isinstance(val[0], np.ndarray):
+            return _to_frame_list(np.stack([_tensor_to_numpy(x) for x in val]))
         # nested (batched) list of frames → take first sample
         if val and isinstance(val[0], (list, tuple)):
             return _to_frame_list(val[0])

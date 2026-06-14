@@ -10,3 +10,8 @@ dist/
 *.wav
 *.json.tmp
 assets/
+.coverage
+system_prompt.prompt
+__pycache__/
+*.pyc
+.pytest_cache/

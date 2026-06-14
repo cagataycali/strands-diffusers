@@ -122,6 +122,22 @@ _MODALITY_RULES = (
     # Broad video/world model families (named after the architecture, not a task).
     (r"Video|Animate|Cosmos|Wan|Hunyuan|Mochi|Allegro|LTX|SkyReels|CogVideo|Latte|Genie", "video"),
     (r"ControlNet|Adapter|IP", "controlled-image"),
+    # Abbreviated transition tokens — MUST precede architecture-family rules so a
+    # family-named video pipeline (Kandinsky5I2V, *T2V) isn't grabbed as image.
+    (r"I2V", "image-to-video"),
+    (r"T2V", "text-to-video"),
+    (r"V2V", "video-to-video"),
+    # Transition variants on family-named pipelines (task encoded as a suffix).
+    (r"Img2Img|Image2Image", "image-to-image"),
+    (r"Fill", "inpainting"),
+    # NOTE: no bare "Edit" rule — editing can be image OR video (e.g. ChronoEdit
+    # is image-to-video). Let such names fall through to their family/Video rule.
+    # Architecture-named image-gen families (task implicit = text-to-image-class).
+    (r"StableDiffusion|Flux|CogView|Bria|Chroma|AuraFlow|Amused|Kandinsky|"
+     r"PixArt|Sana|Lumina|DeepFloyd|Wuerstchen|Kolors|HiDream|Janus|OmniGen|"
+     r"Marigold|VisualCloze", "image"),
+    # Architecture-named audio families.
+    (r"AudioLDM|StableAudio|MusicGen|Musicgen|AceStep|Dance|Spectrogram", "audio"),
     (r"Image", "image"),
 )
 
