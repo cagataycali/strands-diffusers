@@ -1,0 +1,82 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 280" width="600" height="280" fill="none" role="img" aria-label="Robot world model: frame and prompt become a world video and an action chunk">
+  <defs>
+    <linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#8B5CFF"/>
+      <stop offset="0.5" stop-color="#5C7CFF"/>
+      <stop offset="1" stop-color="#22D3EE"/>
+    </linearGradient>
+    <linearGradient id="gh" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#8B5CFF"/>
+      <stop offset="0.5" stop-color="#5C7CFF"/>
+      <stop offset="1" stop-color="#22D3EE"/>
+    </linearGradient>
+  </defs>
+  <style>
+    .lbl{font:600 13px -apple-system,BlinkMacSystemFont,system-ui,sans-serif;fill:#86868b}
+    .mono{font:600 12px ui-monospace,SFMono-Regular,Menlo,monospace;fill:#86868b}
+    .cap{font:700 14px -apple-system,system-ui,sans-serif}
+    .pulse{transform-origin:278px 140px;animation:hp 3s ease-in-out infinite}
+    @keyframes hp{0%,100%{opacity:.9}50%{opacity:1;transform:scale(1.05)}}
+    .scan{animation:sc 2.6s ease-in-out infinite}
+    @keyframes sc{0%{transform:translateX(0)}100%{transform:translateX(128px)}}
+    .trace{stroke-dasharray:260;stroke-dashoffset:260;animation:tr 3s ease-in-out infinite}
+    @keyframes tr{0%{stroke-dashoffset:260}60%,100%{stroke-dashoffset:0}}
+    @media (prefers-reduced-motion: reduce){
+      * { animation: none !important; }
+      .ron { opacity: 1 !important; }
+      .roff { opacity: .25 !important; }
+    }
+  </style>
+  <!-- input: observation frame -->
+  <rect x="36" y="92" width="96" height="72" rx="10" fill="rgba(124,92,255,0.08)"
+        stroke="#3a3a3e" stroke-width="1.5"/>
+  <circle cx="70" cy="128" r="9" fill="none" stroke="url(#gh)" stroke-width="2.5"/>
+  <rect x="86" y="120" width="30" height="20" rx="4" fill="none" stroke="url(#gh)" stroke-width="2"/>
+  <text class="lbl" x="84" y="182" text-anchor="middle">first frame</text>
+  <!-- input: prompt -->
+  <rect x="36" y="40" width="180" height="34" rx="9" fill="rgba(34,211,238,0.06)"
+        stroke="#3a3a3e" stroke-width="1.5"/>
+  <text class="mono" x="50" y="61" fill="#a1a1a6">“put the pot left…”</text>
+
+  <!-- flow into cosmos -->
+  <path id="w1" d="M132 128 C 180 128, 196 140, 232 140" stroke="#3a3a3e" stroke-width="1.5" fill="none"/>
+  <circle r="3" fill="url(#gh)"><animateMotion dur="2s" repeatCount="indefinite" path="M132 128 C 180 128, 196 140, 232 140"/></circle>
+  <path id="w0" d="M216 57 C 230 57, 224 120, 240 132" stroke="#3a3a3e" stroke-width="1.5" fill="none" opacity="0.6"/>
+  <circle r="2.6" fill="url(#gh)"><animateMotion dur="2s" begin="0.4s" repeatCount="indefinite" path="M216 57 C 230 57, 224 120, 240 132"/></circle>
+
+  <!-- cosmos world model -->
+  <g class="pulse">
+    <rect x="236" y="108" width="84" height="64" rx="16" fill="rgba(92,124,255,0.12)"
+          stroke="url(#gh)" stroke-width="2"/>
+  </g>
+  <text class="cap" x="278" y="136" text-anchor="middle" fill="url(#gh)">world</text>
+  <text class="cap" x="278" y="154" text-anchor="middle" fill="url(#gh)">model</text>
+
+  <!-- two outputs -->
+  <path d="M320 134 C 356 134, 366 70, 410 70" stroke="#3a3a3e" stroke-width="1.5" fill="none"/>
+  <circle r="3" fill="url(#gh)"><animateMotion dur="2s" begin="0.9s" repeatCount="indefinite" path="M320 134 C 356 134, 366 70, 410 70"/></circle>
+  <path d="M320 150 C 356 150, 366 150, 410 150" stroke="#3a3a3e" stroke-width="1.5" fill="none"/>
+  <circle r="3" fill="url(#gh)"><animateMotion dur="2s" begin="1.1s" repeatCount="indefinite" path="M320 150 C 356 150, 366 150, 410 150"/></circle>
+
+  <!-- output 1: world video (scanline) -->
+  <rect x="412" y="44" width="150" height="52" rx="9" fill="rgba(124,92,255,0.06)"
+        stroke="#3a3a3e" stroke-width="1.5"/>
+  <rect class="scan" x="412" y="44" width="22" height="52" rx="9" fill="url(#gh)" opacity="0.30"/>
+  <text class="lbl" x="487" y="116" text-anchor="middle">world video · .mp4</text>
+
+  <!-- output 2: action trajectory -->
+  <path class="trace" d="M430 150 L452 120 L486 108 L512 128 L540 116 L560 92" stroke="url(#gh)" stroke-width="2.5" fill="none"
+        stroke-linecap="round" stroke-linejoin="round"/>
+  <circle cx="430" cy="150" r="2.4" fill="#22D3EE" opacity="0.8"/>
+      <circle cx="452" cy="120" r="2.4" fill="#22D3EE" opacity="0.8"/>
+      <circle cx="486" cy="108" r="2.4" fill="#22D3EE" opacity="0.8"/>
+      <circle cx="512" cy="128" r="2.4" fill="#22D3EE" opacity="0.8"/>
+      <circle cx="540" cy="116" r="2.4" fill="#22D3EE" opacity="0.8"/>
+      <circle cx="560" cy="92" r="2.4" fill="#22D3EE" opacity="0.8"/>
+  <circle class="ee" r="4.5" fill="#fff" stroke="url(#gh)" stroke-width="2">
+    <animateMotion dur="3s" repeatCount="indefinite" path="M430 150 L452 120 L486 108 L512 128 L540 116 L560 92"/>
+  </circle>
+  <text class="lbl" x="495" y="182" text-anchor="middle">action chunk · .json</text>
+
+  <text class="lbl" x="300" y="240" text-anchor="middle">one call → a future you can watch <tspan fill="#a1a1a6">and</tspan> actions you can run</text>
+</svg>

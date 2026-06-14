@@ -1,0 +1,86 @@
+site_name: strands-diffusers
+site_description: The universal entrypoint to HuggingFace diffusers for Strands agents - 100% pipeline coverage, zero hardcoding, with robot action outputs.
+site_url: https://cagataycali.github.io/strands-diffusers/
+repo_url: https://github.com/cagataycali/strands-diffusers
+repo_name: cagataycali/strands-diffusers
+edit_uri: edit/main/docs/
+
+theme:
+  name: material
+  logo: assets/logo.svg
+  favicon: assets/logo.svg
+  palette:
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      primary: deep purple
+      accent: indigo
+      toggle:
+        icon: material/weather-night
+        name: Switch to dark mode
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      primary: deep purple
+      accent: indigo
+      toggle:
+        icon: material/weather-sunny
+        name: Switch to light mode
+  features:
+    - navigation.sections
+    - navigation.top
+    - navigation.instant
+    - navigation.tracking
+    - content.code.copy
+    - content.code.annotate
+    - toc.follow
+  font:
+    text: Inter
+    code: JetBrains Mono
+  icon:
+    repo: fontawesome/brands/github
+
+nav:
+  - Home: index.md
+  - Robot world models: wfm.md
+  - Quickstart: quickstart.md
+  - Gallery:
+    - Images: gallery/images.md
+    - Video: gallery/video.md
+    - Audio: gallery/audio.md
+    - Robot actions: gallery/actions.md
+    - 3D mesh: gallery/mesh.md
+  - How it works: layers.md
+  - Find any pipeline: discovery.md
+
+markdown_extensions:
+  - admonition
+  - pymdownx.details
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:pymdownx.superfences.fence_code_format
+  - pymdownx.highlight:
+      anchor_linenums: true
+  - pymdownx.inlinehilite
+  - pymdownx.snippets
+  - pymdownx.tabbed:
+      alternate_style: true
+  - attr_list
+  - md_in_html
+  - tables
+  - toc:
+      permalink: true
+
+plugins:
+  - search
+
+extra:
+  social:
+    - icon: fontawesome/brands/github
+      link: https://github.com/cagataycali/strands-diffusers
+
+extra_css:
+  - stylesheets/extra.css
+
+extra_javascript:
+  - js/glass.js

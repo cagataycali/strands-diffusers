@@ -1,0 +1,101 @@
+name: Auto Release
+
+on:
+  push:
+    tags:
+      - 'v*.*.*'
+
+permissions:
+  contents: write
+  id-token: write
+
+jobs:
+  auto-release:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0          # full history + tags for setuptools-scm
+        token: ${{ secrets.GITHUB_TOKEN }}
+
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: "3.11"
+
+    - name: Install build tooling
+      run: |
+        python -m pip install --upgrade pip
+        pip install build twine packaging
+
+    - name: Extract version from tag
+      id: get_version
+      run: |
+        VERSION=${GITHUB_REF#refs/tags/v}
+        echo "version=$VERSION" >> $GITHUB_OUTPUT
+        echo "Version: $VERSION"
+
+    - name: Build package (version derived from git tag via setuptools-scm)
+      run: python -m build
+
+    - name: Verify built version matches tag (PEP440-normalized)
+      run: |
+        ls -l dist/
+        python - "${{ steps.get_version.outputs.version }}" <<'EOF'
+        import sys, glob, os
+        from packaging.utils import parse_wheel_filename, parse_sdist_filename
+        from packaging.version import Version
+        tag = Version(sys.argv[1])                       # normalize the tag (v1.01 -> 1.1)
+        built = set()
+        for w in glob.glob("dist/*.whl"):
+            built.add(parse_wheel_filename(os.path.basename(w))[1])
+        for s in glob.glob("dist/*.tar.gz"):
+            built.add(parse_sdist_filename(os.path.basename(s))[1])
+        print("tag:", tag, "built:", sorted(map(str, built)))
+        if tag not in built:
+            print(f"::error::Built version(s) {sorted(map(str,built))} != tag {tag}")
+            sys.exit(1)
+        print(f"✅ built version matches tag {tag}")
+        EOF
+
+    - name: Publish to PyPI
+      env:
+        TWINE_USERNAME: __token__
+        TWINE_PASSWORD: ${{ secrets.PYPI_API_TOKEN }}
+      run: twine upload dist/*
+
+    - name: Create GitHub Release
+      uses: softprops/action-gh-release@v2
+      with:
+        tag_name: ${{ github.ref_name }}
+        name: strands-diffusers v${{ steps.get_version.outputs.version }}
+        body: |
+          ## 🎨 strands-diffusers v${{ steps.get_version.outputs.version }}
+
+          The universal entrypoint to HuggingFace `diffusers` for Strands agents —
+          100% pipeline & modality coverage, zero hardcoding.
+
+          ### 📦 Installation
+          ```bash
+          pip install strands-diffusers==${{ steps.get_version.outputs.version }}
+          # extras: pip install "strands-diffusers[video,audio]"
+          ```
+
+          ### 🔄 Upgrade
+          ```bash
+          pip install --upgrade strands-diffusers
+          ```
+
+          **Full Changelog**: https://github.com/cagataycali/strands-diffusers/releases
+        draft: false
+        prerelease: false
+
+    - name: Summary
+      run: |
+        echo "## 🎉 Release Summary" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo "- **Version:** v${{ steps.get_version.outputs.version }}" >> $GITHUB_STEP_SUMMARY
+        echo "- **PyPI:** https://pypi.org/project/strands-diffusers/${{ steps.get_version.outputs.version }}/" >> $GITHUB_STEP_SUMMARY
+        echo "- **GitHub Release:** https://github.com/cagataycali/strands-diffusers/releases/tag/v${{ steps.get_version.outputs.version }}" >> $GITHUB_STEP_SUMMARY

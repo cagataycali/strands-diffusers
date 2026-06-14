@@ -1,0 +1,668 @@
+/* ============================================================================
+   strands-diffusers — glass design system
+   Apple-inspired: NO borders, frosted glass, refined type, generous space.
+   Monochrome ink canvas + a single restrained violet→indigo→cyan accent.
+   Gradient is reserved for the animated hero mesh + primary CTA — never text.
+   ============================================================================ */
+
+:root {
+  --sd-violet: #8B5CFF;
+  --sd-indigo: #5C7CFF;
+  --sd-blue:   #2563eb;
+  --sd-cyan:   #22D3EE;
+  --sd-accent: #7C5CFF;
+
+  /* Glass tokens (light) */
+  --sd-glass-bg:     rgba(255, 255, 255, 0.55);
+  --sd-glass-bg-hi:  rgba(255, 255, 255, 0.72);
+  --sd-glass-shadow: 0 8px 40px -12px rgba(15, 18, 28, 0.18);
+  --sd-glass-shadow-hi: 0 18px 60px -16px rgba(124, 92, 255, 0.28);
+  --sd-blur: saturate(180%) blur(22px);
+
+  --sd-radius:    18px;
+  --sd-radius-lg: 26px;
+
+  /* Apple-grade system font stack; Inter as a graceful fallback */
+  --md-text-font: -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display",
+                  "Inter", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  --md-code-font: "SF Mono", "JetBrains Mono", ui-monospace, "Menlo", monospace;
+}
+
+/* ---------------------------------------------------------------------------
+   Canvas
+--------------------------------------------------------------------------- */
+[data-md-color-scheme="default"] {
+  --md-default-bg-color:        #f5f5f7;   /* Apple light gray */
+  --md-default-bg-color--light: #ffffff;
+  --md-code-bg-color:           rgba(120, 120, 128, 0.10);
+  --md-accent-fg-color:         var(--sd-accent);
+  --md-typeset-a-color:         var(--sd-accent);
+}
+
+[data-md-color-scheme="slate"] {
+  --md-default-bg-color:        #000000;   /* true black, Apple dark */
+  --md-default-bg-color--light: #0b0b0d;
+  --md-code-bg-color:           rgba(255, 255, 255, 0.06);
+  --md-accent-fg-color:         var(--sd-cyan);
+  --md-typeset-a-color:         var(--sd-cyan);
+
+  /* Glass tokens (dark) */
+  --sd-glass-bg:     rgba(28, 28, 32, 0.50);
+  --sd-glass-bg-hi:  rgba(40, 40, 46, 0.62);
+  --sd-glass-shadow: 0 8px 40px -12px rgba(0, 0, 0, 0.6);
+  --sd-glass-shadow-hi: 0 20px 70px -18px rgba(124, 92, 255, 0.42);
+}
+
+body, .md-typeset {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.md-typeset {
+  font-size: 0.82rem;
+  line-height: 1.7;
+  letter-spacing: -0.005em;
+}
+
+.md-main__inner { margin-top: 1.6rem; }
+
+/* ---------------------------------------------------------------------------
+   Header & tabs - frosted, borderless, floating
+--------------------------------------------------------------------------- */
+.md-header {
+  background: var(--sd-glass-bg) !important;
+  -webkit-backdrop-filter: var(--sd-blur);
+  backdrop-filter: var(--sd-blur);
+  box-shadow: 0 1px 0 rgba(128,128,135,0.12);
+  border: none !important;
+  color: var(--md-default-fg-color);
+}
+[data-md-color-scheme="slate"] .md-header {
+  box-shadow: 0 1px 0 rgba(255,255,255,0.06);
+}
+.md-header__title { font-weight: 600; letter-spacing: -0.01em; }
+
+.md-tabs {
+  background: transparent !important;
+  border: none !important;
+}
+.md-tabs__link { opacity: 0.7; font-weight: 500; transition: opacity .2s; }
+.md-tabs__link:hover, .md-tabs__link--active { opacity: 1; }
+
+/* Header text/icons inherit the canvas fg so it's readable on glass */
+.md-header, .md-header__topic, .md-header [class*="__icon"] { color: inherit; }
+
+/* ---------------------------------------------------------------------------
+   Typography - solid, classy, NO gradient fills
+--------------------------------------------------------------------------- */
+.md-typeset h1 {
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  color: var(--md-default-fg-color);
+  background: none;
+  -webkit-text-fill-color: currentColor;
+  font-size: 2.0rem;
+  line-height: 1.12;
+  margin-bottom: 0.5em;
+}
+.md-content__inner > h1:first-of-type {
+  -webkit-text-fill-color: currentColor;
+  background: none;
+}
+.md-typeset h2 {
+  font-weight: 650;
+  letter-spacing: -0.02em;
+  border: none;            /* kill the underline rule */
+  padding-bottom: 0;
+  margin-top: 2.4em;
+  font-size: 1.42rem;
+}
+.md-typeset h2::after { display: none; }   /* kill the gradient tick */
+.md-typeset h3 {
+  font-weight: 600;
+  letter-spacing: -0.015em;
+  font-size: 1.08rem;
+}
+
+/* Links: subtle, underline on hover only */
+.md-typeset a { color: var(--md-typeset-a-color); text-decoration: none; transition: color .15s; }
+.md-typeset a:hover { text-decoration: underline; text-underline-offset: 3px; }
+
+/* ---------------------------------------------------------------------------
+   Glass cards - borderless, frosted, soft lift on hover
+--------------------------------------------------------------------------- */
+.md-typeset .grid.cards > :is(ul, ol) > li,
+.md-typeset .grid > .card,
+.md-typeset .grid > ul > li {
+  border: none !important;
+  border-radius: var(--sd-radius);
+  background: var(--sd-glass-bg);
+  -webkit-backdrop-filter: var(--sd-blur);
+  backdrop-filter: var(--sd-blur);
+  box-shadow: var(--sd-glass-shadow);
+  padding: 1.4rem 1.5rem;
+  transition: transform .3s cubic-bezier(.2,.7,.2,1), box-shadow .3s;
+}
+.md-typeset .grid.cards > :is(ul, ol) > li:hover,
+.md-typeset .grid > .card:hover,
+.md-typeset .grid > ul > li:hover {
+  transform: translateY(-5px);
+  box-shadow: var(--sd-glass-shadow-hi);
+}
+.md-typeset .grid.cards hr { display: none; }   /* drop the card divider line */
+
+/* ---------------------------------------------------------------------------
+   Code - frosted slab, no border, rounded
+--------------------------------------------------------------------------- */
+.md-typeset pre > code,
+.md-typeset .highlight {
+  border-radius: var(--sd-radius);
+}
+.md-typeset pre {
+  border-radius: var(--sd-radius);
+  box-shadow: var(--sd-glass-shadow);
+}
+.md-typeset pre > code { border: none; }
+.md-typeset .highlight { border: none; box-shadow: none; }
+.md-typeset .highlight::before { display: none; }   /* kill old gradient rail */
+[data-md-color-scheme="slate"] .md-typeset pre > code,
+[data-md-color-scheme="slate"] .md-typeset .highlight {
+  background: rgba(22, 22, 26, 0.85);
+  -webkit-backdrop-filter: var(--sd-blur);
+  backdrop-filter: var(--sd-blur);
+}
+/* inline code: soft pill, no border */
+.md-typeset code:not(pre code) {
+  border: none;
+  border-radius: 7px;
+  padding: 0.12em 0.42em;
+  font-size: 0.82em;
+}
+
+/* console blocks → deep terminal glass */
+.md-typeset .language-console .highlight,
+.md-typeset pre:has(> code.language-console) {
+  background: rgba(10, 10, 12, 0.92) !important;
+}
+
+/* ---------------------------------------------------------------------------
+   Result callout - frosted, borderless
+--------------------------------------------------------------------------- */
+.md-typeset .result {
+  border: none;
+  border-left: none;
+  background: var(--sd-glass-bg);
+  -webkit-backdrop-filter: var(--sd-blur);
+  backdrop-filter: var(--sd-blur);
+  border-radius: var(--sd-radius);
+  box-shadow: var(--sd-glass-shadow);
+  padding: 1.2rem 1.4rem;
+}
+
+/* ---------------------------------------------------------------------------
+   Tables - borderless, glass, gentle zebra
+--------------------------------------------------------------------------- */
+.md-typeset table:not([class]) {
+  border: none;
+  border-radius: var(--sd-radius);
+  overflow: hidden;
+  box-shadow: var(--sd-glass-shadow);
+  background: var(--sd-glass-bg);
+  -webkit-backdrop-filter: var(--sd-blur);
+  backdrop-filter: var(--sd-blur);
+}
+.md-typeset table:not([class]) th {
+  background: transparent;
+  color: inherit;
+  font-weight: 650;
+  letter-spacing: -0.01em;
+  border: none;
+}
+.md-typeset table:not([class]) td { border: none; }
+.md-typeset table:not([class]) tr:nth-child(even) td {
+  background: rgba(128, 128, 135, 0.06);
+}
+.md-typeset table:not([class]) tr:hover td { background: rgba(124,92,255,0.06); }
+.md-typeset table:not([class]) td code { font-size: 0.82em; }
+
+/* ---------------------------------------------------------------------------
+   Media - clean, borderless, soft shadow + spring hover
+--------------------------------------------------------------------------- */
+.md-typeset img,
+.md-typeset video {
+  border-radius: var(--sd-radius);
+  border: none;
+}
+.md-typeset figure img,
+.md-typeset .grid img,
+.md-typeset table img {
+  box-shadow: var(--sd-glass-shadow);
+  transition: transform .4s cubic-bezier(.2,.7,.2,1), box-shadow .35s;
+}
+.md-typeset figure img:hover,
+.md-typeset .grid img:hover,
+.md-typeset table img:hover {
+  transform: scale(1.025);
+  box-shadow: var(--sd-glass-shadow-hi);
+}
+.md-typeset figcaption { font-size: .74rem; opacity: .62; margin-top: .5em; }
+.md-typeset audio {
+  height: 38px;
+  width: 320px;
+  max-width: 100%;
+  border-radius: 999px;
+}
+
+/* ---------------------------------------------------------------------------
+   Admonitions - frosted, hairline accent (no heavy borders)
+--------------------------------------------------------------------------- */
+.md-typeset .admonition,
+.md-typeset details {
+  border: none !important;
+  border-radius: var(--sd-radius);
+  background: var(--sd-glass-bg);
+  -webkit-backdrop-filter: var(--sd-blur);
+  backdrop-filter: var(--sd-blur);
+  box-shadow: var(--sd-glass-shadow);
+}
+.md-typeset .admonition-title,
+.md-typeset summary { border: none !important; background: transparent; font-weight: 600; }
+
+/* ---------------------------------------------------------------------------
+   Navigation - quiet, borderless, glassy active pill
+--------------------------------------------------------------------------- */
+.md-nav { font-size: 0.74rem; }
+.md-nav__title { font-weight: 600; opacity: 0.6; }
+.md-nav__link { transition: color .15s, opacity .15s; opacity: 0.78; }
+.md-nav__link:hover { opacity: 1; }
+.md-nav__link--active {
+  opacity: 1;
+  font-weight: 600;
+  color: var(--md-accent-fg-color) !important;
+}
+.md-sidebar { font-weight: 450; }
+
+/* Search → frosted */
+.md-search__form {
+  border-radius: 999px;
+  background: var(--sd-glass-bg);
+  -webkit-backdrop-filter: var(--sd-blur);
+  backdrop-filter: var(--sd-blur);
+  box-shadow: none;
+}
+.md-search__input { border-radius: 999px; }
+
+/* Footer - quiet, borderless */
+.md-footer { background: transparent; }
+.md-footer-meta { background: rgba(0,0,0,0.02); }
+[data-md-color-scheme="slate"] .md-footer-meta { background: rgba(255,255,255,0.02); }
+
+/* Buttons (md-button) → glass pill */
+.md-typeset .md-button {
+  border: none;
+  border-radius: 999px;
+  background: var(--sd-glass-bg);
+  -webkit-backdrop-filter: var(--sd-blur);
+  backdrop-filter: var(--sd-blur);
+  box-shadow: var(--sd-glass-shadow);
+  font-weight: 550;
+  transition: transform .2s, box-shadow .2s;
+}
+.md-typeset .md-button:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--sd-glass-shadow-hi);
+  border: none;
+}
+.md-typeset .md-button--primary {
+  background: linear-gradient(120deg, var(--sd-violet), var(--sd-indigo) 50%, var(--sd-cyan));
+  color: #fff;
+}
+
+/* Selection tint */
+::selection { background: rgba(124, 92, 255, 0.25); }
+
+/* ---------------------------------------------------------------------------
+   "pill" chips for modality counts (custom HTML) → frosted, borderless
+--------------------------------------------------------------------------- */
+.sd-pill {
+  display: inline-block;
+  padding: .3em .9em;
+  margin: .2em;
+  border-radius: 999px;
+  font-size: .74rem;
+  font-weight: 600;
+  letter-spacing: -.005em;
+  color: var(--md-default-fg-color);
+  background: var(--sd-glass-bg);
+  -webkit-backdrop-filter: var(--sd-blur);
+  backdrop-filter: var(--sd-blur);
+  box-shadow: var(--sd-glass-shadow);
+  transition: transform .3s cubic-bezier(.2,.7,.2,1), box-shadow .3s;
+}
+.sd-pill:hover { transform: translateY(-2px); box-shadow: var(--sd-glass-shadow-hi); }
+[data-md-color-scheme="slate"] .sd-pill { color: rgba(255,255,255,0.82); }
+
+/* ---------------------------------------------------------------------------
+   Ambient backdrop - faint color bloom so glass has something to refract.
+--------------------------------------------------------------------------- */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background:
+    radial-gradient(40rem 40rem at 12% -8%, rgba(139,92,255,0.10), transparent 60%),
+    radial-gradient(38rem 38rem at 98% 8%, rgba(34,211,238,0.09), transparent 60%),
+    radial-gradient(46rem 46rem at 50% 116%, rgba(124,92,255,0.07), transparent 60%);
+}
+[data-md-color-scheme="slate"] body::before {
+  background:
+    radial-gradient(42rem 42rem at 10% -10%, rgba(139,92,255,0.18), transparent 60%),
+    radial-gradient(40rem 40rem at 100% 6%, rgba(34,211,238,0.14), transparent 60%),
+    radial-gradient(48rem 48rem at 50% 118%, rgba(124,92,255,0.12), transparent 62%);
+}
+
+/* Honor reduced-transparency for accessibility */
+@media (prefers-reduced-transparency: reduce) {
+  .md-header, .grid.cards > :is(ul,ol) > li, .md-typeset table:not([class]),
+  .md-typeset .admonition, .md-typeset details, .md-typeset .result,
+  .sd-hero .sd-tag, .sd-pill, .md-search__form, .md-typeset .md-button {
+    -webkit-backdrop-filter: none !important;
+    backdrop-filter: none !important;
+  }
+}
+
+/* ===========================================================================
+   DEEP POLISH LAYER
+   =========================================================================== */
+
+/* ---- Scroll-reveal: glass elements rise + fade into place ---- */
+.md-typeset .sd-reveal {
+  opacity: 0;
+  transform: translateY(14px);
+  transition: opacity .6s cubic-bezier(.2,.7,.2,1), transform .6s cubic-bezier(.2,.7,.2,1);
+  will-change: opacity, transform;
+}
+.md-typeset .sd-reveal.sd-in { opacity: 1; transform: none; }
+@media (prefers-reduced-motion: reduce) {
+  .md-typeset .sd-reveal { opacity: 1 !important; transform: none !important; transition: none; }
+}
+
+/* ---- Pointer-reactive sheen on cards (driven by --mx/--my from glass.js) ---- */
+.md-typeset .grid.cards > :is(ul, ol) > li {
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+}
+.md-typeset .grid.cards > :is(ul, ol) > li::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: radial-gradient(
+    16rem 16rem at var(--mx, 50%) var(--my, 0%),
+    rgba(139, 92, 255, 0.14), transparent 60%);
+  opacity: 0;
+  transition: opacity .35s;
+}
+.md-typeset .grid.cards > :is(ul, ol) > li:hover::after { opacity: 1; }
+
+/* ---- Code blocks → macOS "window" with traffic-light dots ---- */
+.md-typeset .highlight { position: relative; }
+.md-typeset .highlight > pre { padding-top: 2.3rem; }
+.md-typeset .highlight::before {
+  content: "";
+  position: absolute;
+  top: 0.95rem; left: 1.05rem;
+  width: 0.62rem; height: 0.62rem;
+  border-radius: 50%;
+  background: #ff5f57;
+  box-shadow: 1.05rem 0 0 #febc2e, 2.1rem 0 0 #28c840;
+  opacity: 0.9;
+  z-index: 2;
+}
+.md-typeset .language-console .highlight::before { opacity: 0.55; }
+.md-typeset pre > code { padding-top: 0; }
+
+/* ---- Refined scrollbar (thin, glassy) ---- */
+* { scrollbar-width: thin; scrollbar-color: rgba(124,92,255,0.35) transparent; }
+::-webkit-scrollbar { width: 10px; height: 10px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb {
+  background: rgba(124,92,255,0.30);
+  border-radius: 999px;
+  border: 3px solid transparent;
+  background-clip: content-box;
+}
+::-webkit-scrollbar-thumb:hover { background: rgba(124,92,255,0.55); background-clip: content-box; }
+
+/* ---- Accessible focus rings (keyboard only) ---- */
+.md-typeset a:focus-visible,
+.md-nav__link:focus-visible,
+.md-typeset .md-button:focus-visible,
+.md-search__input:focus-visible {
+  outline: 2px solid var(--md-accent-fg-color);
+  outline-offset: 3px;
+  border-radius: 6px;
+}
+
+/* ---- TOC: quiet, with a soft active marker ---- */
+.md-nav--secondary .md-nav__link--active { position: relative; }
+.md-nav--secondary .md-nav__link--active::before {
+  content: "";
+  position: absolute;
+  left: -0.8rem; top: 50%;
+  width: 4px; height: 1.1em;
+  transform: translateY(-50%);
+  border-radius: 999px;
+  background: linear-gradient(var(--sd-violet), var(--sd-cyan));
+}
+
+/* ---- Copy button → glassy, borderless ---- */
+.md-clipboard { border-radius: 8px; transition: background .2s, color .2s, transform .2s; }
+.md-clipboard:hover { background: rgba(124,92,255,0.18); color: var(--md-accent-fg-color); transform: scale(1.1); }
+
+/* ---- Smooth anchor scrolling for permalinks ---- */
+html { scroll-behavior: smooth; }
+@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+
+/* ===========================================================================
+   ANIMATED GRADIENT MESH HERO
+   Drifting color blobs behind a frosted veil - the Apple "aurora" backdrop.
+   Works with the existing <div class="sd-hero"> markup; the .sd-mesh blobs
+   are injected by glass.js, so no markup change is required.
+   =========================================================================== */
+.sd-hero {
+  position: relative;
+  overflow: hidden;
+  border-radius: var(--sd-radius-lg);
+  margin: 0.5rem 0 1.6rem;
+  padding: 3.4rem 2.4rem;
+  isolation: isolate;
+  background: transparent;
+  box-shadow: var(--sd-glass-shadow);
+}
+
+/* Mesh container holds the drifting blobs + a frosting veil */
+.sd-mesh {
+  position: absolute;
+  inset: -20%;
+  z-index: -2;
+  pointer-events: none;
+  filter: blur(48px) saturate(150%);
+}
+/* frosting veil so the mesh stays soft & text stays crisp */
+.sd-hero::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: var(--sd-glass-bg);
+  -webkit-backdrop-filter: blur(6px);
+  backdrop-filter: blur(6px);
+}
+.sd-hero::before { display: none; }
+
+.sd-blob {
+  position: absolute;
+  width: 42%;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  opacity: 0.85;
+  mix-blend-mode: screen;
+  will-change: transform;
+}
+[data-md-color-scheme="default"] .sd-blob { mix-blend-mode: multiply; opacity: 0.55; }
+
+.sd-blob--1 { background: radial-gradient(circle at 30% 30%, #8B5CFF, transparent 70%); top: -6%;  left: 4%;  animation: sdDrift1 18s ease-in-out infinite; }
+.sd-blob--2 { background: radial-gradient(circle at 30% 30%, #22D3EE, transparent 70%); top: 8%;   right: 2%; animation: sdDrift2 22s ease-in-out infinite; }
+.sd-blob--3 { background: radial-gradient(circle at 30% 30%, #5C7CFF, transparent 70%); bottom: -10%; left: 26%; animation: sdDrift3 20s ease-in-out infinite; }
+.sd-blob--4 { background: radial-gradient(circle at 30% 30%, #B07CFF, transparent 70%); bottom: 0%; right: 22%; animation: sdDrift4 26s ease-in-out infinite; }
+
+@keyframes sdDrift1 { 0%,100% { transform: translate(0,0) scale(1); } 33% { transform: translate(18%, 12%) scale(1.15); } 66% { transform: translate(-8%, 20%) scale(0.92); } }
+@keyframes sdDrift2 { 0%,100% { transform: translate(0,0) scale(1); } 33% { transform: translate(-16%, 14%) scale(0.9); } 66% { transform: translate(-6%, -12%) scale(1.18); } }
+@keyframes sdDrift3 { 0%,100% { transform: translate(0,0) scale(1); } 33% { transform: translate(14%, -16%) scale(1.1); } 66% { transform: translate(24%, 6%) scale(0.95); } }
+@keyframes sdDrift4 { 0%,100% { transform: translate(0,0) scale(1); } 33% { transform: translate(-18%, -10%) scale(1.12); } 66% { transform: translate(8%, -18%) scale(0.9); } }
+
+/* Hero content — big, airy, solid type (NO gradient text) */
+.sd-hero h1, .sd-hero h2 {
+  margin: 0.2rem 0;
+  font-weight: 700;
+  letter-spacing: -0.04em;
+  line-height: 1.06;
+  font-size: 2.6rem;
+  color: var(--md-default-fg-color);
+  background: none !important;
+  -webkit-text-fill-color: currentColor !important;
+}
+.sd-hero h2::after { display: none; }
+.sd-hero p {
+  font-size: 1.15rem;
+  font-weight: 400;
+  opacity: 0.66;
+  max-width: 42rem;
+  letter-spacing: -0.01em;
+  line-height: 1.5;
+}
+.sd-hero .sd-tag {
+  display: inline-block;
+  font-size: 0.74rem;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  color: var(--md-default-fg-color);
+  background: var(--sd-glass-bg);
+  -webkit-backdrop-filter: var(--sd-blur);
+  backdrop-filter: var(--sd-blur);
+  border: none;
+  border-radius: 999px;
+  padding: 0.5em 1.1em;
+  margin-top: 1.2rem;
+  box-shadow: var(--sd-glass-shadow);
+  font-family: var(--md-code-font);
+}
+[data-md-color-scheme="slate"] .sd-hero .sd-tag { color: rgba(255,255,255,0.78); }
+
+/* Respect reduced motion: freeze the mesh on a pleasing pose */
+@media (prefers-reduced-motion: reduce) {
+  .sd-blob { animation: none !important; }
+}
+
+/* ---------------------------------------------------------------------------
+   Responsive
+--------------------------------------------------------------------------- */
+@media screen and (max-width: 760px) {
+  .sd-hero { padding: 2.2rem 1.4rem; border-radius: 20px; }
+  .sd-hero h1, .sd-hero h2 { font-size: 1.9rem; }
+}
+
+/* ===========================================================================
+   MERMAID — glass diagrams: hairline edges, frosted nodes, quiet labels.
+   Diagrams are centered, borderless, and tuned to the violet→cyan accent.
+   =========================================================================== */
+.mermaid { text-align: center; margin: 1.6rem 0; }
+
+.mermaid .node rect,
+.mermaid .node polygon,
+.mermaid .node circle,
+.mermaid .node path,
+.mermaid .cluster rect {
+  rx: 14px; ry: 14px;
+  filter: drop-shadow(0 6px 18px rgba(15,18,28,0.10));
+}
+/* frosted node fills */
+.mermaid .node rect,
+.mermaid .node polygon,
+.mermaid .node path {
+  fill: var(--sd-glass-bg) !important;
+  stroke: rgba(124,92,255,0.32) !important;
+  stroke-width: 1.2px !important;
+}
+.mermaid .edgePath .path,
+.mermaid .flowchart-link {
+  stroke: rgba(124,92,255,0.45) !important;
+  stroke-width: 1.5px !important;
+}
+.mermaid .arrowheadPath,
+.mermaid marker path { fill: rgba(124,92,255,0.6) !important; stroke: none !important; }
+.mermaid .edgeLabel {
+  background: transparent !important;
+  color: var(--md-default-fg-color) !important;
+  opacity: 0.7;
+  font-size: 0.78em;
+}
+.mermaid .edgeLabel rect, .mermaid .edgeLabel foreignObject div {
+  fill: transparent !important;
+  background: transparent !important;
+}
+.mermaid .cluster rect {
+  fill: rgba(128,128,135,0.05) !important;
+  stroke: rgba(128,128,135,0.18) !important;
+  stroke-width: 1px !important;
+}
+.mermaid .nodeLabel, .mermaid .edgeLabel, .mermaid span, .mermaid p {
+  font-family: var(--md-text-font) !important;
+  font-weight: 500;
+  color: var(--md-default-fg-color) !important;
+  letter-spacing: -0.01em;
+}
+/* dark scheme: deeper node shadows + brighter edges */
+[data-md-color-scheme="slate"] .mermaid .node rect,
+[data-md-color-scheme="slate"] .mermaid .node polygon,
+[data-md-color-scheme="slate"] .mermaid .node path,
+[data-md-color-scheme="slate"] .mermaid .cluster rect {
+  filter: drop-shadow(0 8px 22px rgba(0,0,0,0.5));
+}
+[data-md-color-scheme="slate"] .mermaid .node rect,
+[data-md-color-scheme="slate"] .mermaid .node polygon,
+[data-md-color-scheme="slate"] .mermaid .node path {
+  stroke: rgba(34,211,238,0.4) !important;
+}
+[data-md-color-scheme="slate"] .mermaid .edgePath .path,
+[data-md-color-scheme="slate"] .mermaid .flowchart-link {
+  stroke: rgba(34,211,238,0.5) !important;
+}
+[data-md-color-scheme="slate"] .mermaid .arrowheadPath,
+[data-md-color-scheme="slate"] .mermaid marker path { fill: rgba(34,211,238,0.65) !important; }
+
+/* ---- Logo: subtle hover breathe (matches the family) ---- */
+.md-header__button.md-logo img,
+.md-header__button.md-logo svg { transition: transform .4s cubic-bezier(.2,.7,.2,1); }
+.md-header__button.md-logo:hover img,
+.md-header__button.md-logo:hover svg { transform: rotate(-8deg) scale(1.06); }
+
+/* ---- Explainer animations: centered, borderless, glassy frame ---- */
+.sd-anim {
+  display: block;
+  margin: 1.6rem auto;
+  max-width: 100%;
+  width: 100%;
+  height: auto;
+}
+.sd-anim--sm { max-width: 480px; }
+.sd-anim--md { max-width: 600px; }
+.sd-anim figure, figure.sd-anim { margin: 1.8rem auto; text-align: center; }
+figure.sd-anim img { width: 100%; height: auto; border-radius: 14px; }
+figure.sd-anim figcaption {
+  margin-top: .6rem; font-size: .8rem; color: var(--md-default-fg-color--light);
+}

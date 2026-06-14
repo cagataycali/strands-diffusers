@@ -1,0 +1,34 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="200" height="200" fill="none" role="img" aria-label="a rotating 3D wireframe mesh">
+  <defs>
+    <linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#8B5CFF"/>
+      <stop offset="0.5" stop-color="#5C7CFF"/>
+      <stop offset="1" stop-color="#22D3EE"/>
+    </linearGradient>
+    <linearGradient id="gh" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#8B5CFF"/>
+      <stop offset="0.5" stop-color="#5C7CFF"/>
+      <stop offset="1" stop-color="#22D3EE"/>
+    </linearGradient>
+  </defs>
+  <style>
+    .lbl{font:600 13px -apple-system,BlinkMacSystemFont,system-ui,sans-serif;fill:#86868b}
+    .mono{font:600 12px ui-monospace,SFMono-Regular,Menlo,monospace;fill:#86868b}
+    .cap{font:700 14px -apple-system,system-ui,sans-serif}
+    .spin{transform-origin:100px 100px;animation:sp 8s linear infinite}
+    @keyframes sp{0%{transform:rotateY(0) scaleX(1)}25%{transform:scaleX(.3)}
+      50%{transform:scaleX(-1)}75%{transform:scaleX(-.3)}100%{transform:scaleX(1)}}
+    @media (prefers-reduced-motion: reduce){
+      * { animation: none !important; }
+      .ron { opacity: 1 !important; }
+      .roff { opacity: .25 !important; }
+    }
+  </style>
+  <g class="spin">
+    <circle cx="100" cy="100" r="60" fill="rgba(124,92,255,0.05)"/>
+    <ellipse cx="100" cy="100" rx="58" ry="22" fill="none" stroke="url(#gh)" stroke-width="1.6" opacity="0.9"/><ellipse cx="100" cy="100" rx="52" ry="40" fill="none" stroke="url(#gh)" stroke-width="1.6" opacity="0.55"/><ellipse cx="100" cy="100" rx="60" ry="12" fill="none" stroke="url(#gh)" stroke-width="1.6" opacity="0.7"/>
+    <ellipse cx="100" cy="100" rx="60" ry="60" fill="none" stroke="url(#gh)" stroke-width="1.3" opacity="0.5"/><ellipse cx="100" cy="100" rx="42" ry="60" fill="none" stroke="url(#gh)" stroke-width="1.3" opacity="0.5"/><ellipse cx="100" cy="100" rx="20" ry="60" fill="none" stroke="url(#gh)" stroke-width="1.3" opacity="0.5"/>
+    <circle cx="103.3" cy="121.7" r="1.8" fill="#22D3EE" opacity="0.8"/><circle cx="68.7" cy="116.7" r="1.8" fill="#22D3EE" opacity="0.8"/><circle cx="81.4" cy="90.6" r="1.8" fill="#22D3EE" opacity="0.8"/><circle cx="154.0" cy="102.2" r="1.8" fill="#22D3EE" opacity="0.8"/><circle cx="98.1" cy="116.2" r="1.8" fill="#22D3EE" opacity="0.8"/><circle cx="140.9" cy="99.4" r="1.8" fill="#22D3EE" opacity="0.8"/><circle cx="121.3" cy="82.4" r="1.8" fill="#22D3EE" opacity="0.8"/><circle cx="81.1" cy="88.7" r="1.8" fill="#22D3EE" opacity="0.8"/><circle cx="63.4" cy="79.3" r="1.8" fill="#22D3EE" opacity="0.8"/><circle cx="49.9" cy="96.3" r="1.8" fill="#22D3EE" opacity="0.8"/><circle cx="87.5" cy="88.4" r="1.8" fill="#22D3EE" opacity="0.8"/><circle cx="102.3" cy="77.4" r="1.8" fill="#22D3EE" opacity="0.8"/><circle cx="92.0" cy="111.9" r="1.8" fill="#22D3EE" opacity="0.8"/><circle cx="127.2" cy="84.7" r="1.8" fill="#22D3EE" opacity="0.8"/>
+  </g>
+  <text class="lbl" x="100" y="192" text-anchor="middle">.ply / .obj mesh</text>
+</svg>

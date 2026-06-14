@@ -1,0 +1,56 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 460 260" width="460" height="260" fill="none" role="img" aria-label="The pipeline catalog is read from diffusers at runtime">
+  <defs>
+    <linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#8B5CFF"/>
+      <stop offset="0.5" stop-color="#5C7CFF"/>
+      <stop offset="1" stop-color="#22D3EE"/>
+    </linearGradient>
+    <linearGradient id="gh" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#8B5CFF"/>
+      <stop offset="0.5" stop-color="#5C7CFF"/>
+      <stop offset="1" stop-color="#22D3EE"/>
+    </linearGradient>
+  </defs>
+  <style>
+    .lbl{font:600 13px -apple-system,BlinkMacSystemFont,system-ui,sans-serif;fill:#86868b}
+    .mono{font:600 12px ui-monospace,SFMono-Regular,Menlo,monospace;fill:#86868b}
+    .cap{font:700 14px -apple-system,system-ui,sans-serif}
+    .row{fill:#86868b}
+    .r0{animation:rh0 6s linear infinite}
+    @keyframes rh0{0%,8%{fill:#86868b}12%,20%{fill:#fff;font-weight:700}26%,100%{fill:#86868b}}
+    .r1{animation:rh1 6s linear infinite}
+    @keyframes rh1{0%,17%{fill:#86868b}21%,29%{fill:#fff;font-weight:700}35%,100%{fill:#86868b}}
+    .r2{animation:rh2 6s linear infinite}
+    @keyframes rh2{0%,26%{fill:#86868b}30%,38%{fill:#fff;font-weight:700}44%,100%{fill:#86868b}}
+    .r3{animation:rh3 6s linear infinite}
+    @keyframes rh3{0%,35%{fill:#86868b}39%,47%{fill:#fff;font-weight:700}53%,100%{fill:#86868b}}
+    .r4{animation:rh4 6s linear infinite}
+    @keyframes rh4{0%,44%{fill:#86868b}48%,56%{fill:#fff;font-weight:700}62%,100%{fill:#86868b}}
+    .r5{animation:rh5 6s linear infinite}
+    @keyframes rh5{0%,53%{fill:#86868b}57%,65%{fill:#fff;font-weight:700}71%,100%{fill:#86868b}}
+    .r6{animation:rh6 6s linear infinite}
+    @keyframes rh6{0%,62%{fill:#86868b}66%,74%{fill:#fff;font-weight:700}80%,100%{fill:#86868b}}
+    .r7{animation:rh7 6s linear infinite}
+    @keyframes rh7{0%,71%{fill:#86868b}75%,83%{fill:#fff;font-weight:700}89%,100%{fill:#86868b}}
+    .scanbar{animation:scb 6s linear infinite}
+    @keyframes scb{0%,8%{transform:translateY(0);opacity:0}10%{opacity:.9}86%{opacity:.9}90%,100%{transform:translateY(158px);opacity:0}}
+    @media (prefers-reduced-motion: reduce){
+      * { animation: none !important; }
+      .ron { opacity: 1 !important; }
+      .roff { opacity: .25 !important; }
+    }
+  </style>
+  <text class="lbl" x="48" y="32">diffusers._import_structure  →  read at runtime</text>
+  <rect class="scanbar" x="40" y="46" width="300" height="18" rx="5"
+        fill="rgba(124,92,255,0.16)"/>
+  <text class="mono row r0" x="48" y="60">StableDiffusionXLPipeline</text>
+  <text class="mono row r1" x="48" y="82">LTXPipeline</text>
+  <text class="mono row r2" x="48" y="104">Cosmos3OmniPipeline</text>
+  <text class="mono row r3" x="48" y="126">AudioLDMPipeline</text>
+  <text class="mono row r4" x="48" y="148">ShapEPipeline</text>
+  <text class="mono row r5" x="48" y="170">FluxPipeline</text>
+  <text class="mono row r6" x="48" y="192">WanPipeline</text>
+  <text class="mono row r7" x="48" y="214">HunyuanVideoPipeline</text>
+  <text class="cap" x="48" y="254" fill="url(#gh)">300+ pipelines</text>
+  <text class="lbl" x="190" y="254">· nothing hardcoded</text>
+</svg>

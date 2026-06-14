@@ -1,0 +1,26 @@
+__pycache__/
+*.pyc
+*.egg-info/
+build/
+dist/
+.venv/
+.pytest_cache/
+.ruff_cache/
+.coverage
+*.bak
+*.json.tmp
+strands_diffusers/_version.py
+system_prompt.prompt
+site/
+
+# Generated media is ignored everywhere EXCEPT the committed docs gallery.
+*.mp4
+*.png
+*.jpg
+*.wav
+*.gif
+/assets/
+
+# Docs gallery assets are real, committed outputs — always track them.
+!docs/assets/
+!docs/assets/**

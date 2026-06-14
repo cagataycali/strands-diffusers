@@ -1,0 +1,8 @@
+strands-agents
+diffusers>=0.30
+transformers>=4.40
+torch
+pillow
+numpy
+accelerate
+matplotlib

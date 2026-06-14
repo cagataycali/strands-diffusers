@@ -1,0 +1,78 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 300" width="640" height="300" fill="none" role="img" aria-label="Three Cosmos modes: policy, forward dynamics, inverse dynamics">
+  <defs>
+    <linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#8B5CFF"/>
+      <stop offset="0.5" stop-color="#5C7CFF"/>
+      <stop offset="1" stop-color="#22D3EE"/>
+    </linearGradient>
+    <linearGradient id="gh" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#8B5CFF"/>
+      <stop offset="0.5" stop-color="#5C7CFF"/>
+      <stop offset="1" stop-color="#22D3EE"/>
+    </linearGradient>
+  </defs>
+  <style>
+    .lbl{font:600 13px -apple-system,BlinkMacSystemFont,system-ui,sans-serif;fill:#86868b}
+    .mono{font:600 12px ui-monospace,SFMono-Regular,Menlo,monospace;fill:#86868b}
+    .cap{font:700 14px -apple-system,system-ui,sans-serif}
+    .cap2{font:700 12px -apple-system,system-ui,sans-serif}
+    .pulse{animation:rmp 3s ease-in-out infinite}
+    .p1{animation-delay:.5s}.p2{animation-delay:1s}
+    @keyframes rmp{0%,100%{opacity:.85}50%{opacity:1}}
+    .trace2{stroke-dasharray:120;stroke-dashoffset:120;animation:rmt 2.6s ease-in-out infinite}
+    @keyframes rmt{0%{stroke-dashoffset:120}55%,100%{stroke-dashoffset:0}}
+    .scan2{animation:rms 2s linear infinite}
+    @keyframes rms{0%{transform:translateX(0)}100%{transform:translateX(32px)}}
+    @media (prefers-reduced-motion: reduce){
+      * { animation: none !important; }
+      .ron { opacity: 1 !important; }
+      .roff { opacity: .25 !important; }
+    }
+  </style>
+<text class="cap" x="106.5" y="26" text-anchor="middle" fill="url(#gh)">policy</text>
+  <text class="lbl" x="106.5" y="44" text-anchor="middle">what should the robot do?</text>
+  <text class="cap" x="319.5" y="26" text-anchor="middle" fill="url(#gh)">forward dynamics</text>
+  <text class="lbl" x="319.5" y="44" text-anchor="middle">what happens if I act?</text>
+  <line x1="213" y1="60" x2="213" y2="270" stroke="#2a2a2e" stroke-width="1"/>
+  <text class="cap" x="532.5" y="26" text-anchor="middle" fill="url(#gh)">inverse dynamics</text>
+  <text class="lbl" x="532.5" y="44" text-anchor="middle">what actions made this?</text>
+  <line x1="426" y1="60" x2="426" y2="270" stroke="#2a2a2e" stroke-width="1"/>
+  <rect x="18" y="96" width="58" height="42" rx="8" fill="rgba(124,92,255,0.08)" stroke="#3a3a3e" stroke-width="1.4"/><circle cx="34" cy="117.0" r="6" fill="none" stroke="url(#gh)" stroke-width="2"/><rect x="44" y="110.0" width="20" height="14" rx="3" fill="none" stroke="url(#gh)" stroke-width="1.6"/>
+  <text class="lbl" x="47" y="156" text-anchor="middle">frame</text>
+  <rect x="16" y="168" width="64" height="30" rx="8" fill="rgba(34,211,238,0.06)" stroke="#3a3a3e" stroke-width="1.4"/><text class="mono" x="48.0" y="187.0" text-anchor="middle">prompt</text>
+  <path d="M76 117 C 96 117, 96 130, 118 132" stroke="#3a3a3e" stroke-width="1.5" fill="none" opacity="0.5"/>
+  <circle r="3" fill="url(#gh)" opacity="1.0"><animateMotion dur="2.0s" begin="0.0s" repeatCount="indefinite" path="M76 117 C 96 117, 96 130, 118 132" calcMode="spline" keyTimes="0;1" keySplines="0.4 0 0.2 1"/></circle>
+  <path d="M80 183 C 100 183, 100 150, 118 146" stroke="#3a3a3e" stroke-width="1.5" fill="none" opacity="0.5"/>
+  <circle r="3" fill="url(#gh)" opacity="1.0"><animateMotion dur="2.0s" begin="0.3s" repeatCount="indefinite" path="M80 183 C 100 183, 100 150, 118 146" calcMode="spline" keyTimes="0;1" keySplines="0.4 0 0.2 1"/></circle>
+  <g class="pulse p0"><rect x="118" y="110" width="64" height="56" rx="13" fill="rgba(92,124,255,0.12)" stroke="url(#gh)" stroke-width="1.8"/></g><text class="cap2" x="150.0" y="137.0" text-anchor="middle" fill="url(#gh)">world</text><text class="cap2" x="150.0" y="153.0" text-anchor="middle" fill="url(#gh)">model</text>
+  <path d="M182 124 C 196 124, 196 112, 205 112" stroke="#3a3a3e" stroke-width="1.5" fill="none" opacity="0.5"/>
+  <circle r="3" fill="url(#gh)" opacity="1.0"><animateMotion dur="1.8s" begin="0.9s" repeatCount="indefinite" path="M182 124 C 196 124, 196 112, 205 112" calcMode="spline" keyTimes="0;1" keySplines="0.4 0 0.2 1"/></circle>
+  <path d="M182 150 C 196 150, 196 162, 205 162" stroke="#3a3a3e" stroke-width="1.5" fill="none" opacity="0.5"/>
+  <circle r="3" fill="url(#gh)" opacity="1.0"><animateMotion dur="1.8s" begin="1.1s" repeatCount="indefinite" path="M182 150 C 196 150, 196 162, 205 162" calcMode="spline" keyTimes="0;1" keySplines="0.4 0 0.2 1"/></circle>
+  <rect x="229" y="96" width="58" height="42" rx="8" fill="rgba(124,92,255,0.08)" stroke="#3a3a3e" stroke-width="1.4"/><circle cx="245" cy="117.0" r="6" fill="none" stroke="url(#gh)" stroke-width="2"/><rect x="255" y="110.0" width="20" height="14" rx="3" fill="none" stroke="url(#gh)" stroke-width="1.6"/>
+  <text class="lbl" x="258" y="156" text-anchor="middle">frame</text>
+  <path d="M231 184 q 10 -12 20 0 t 20 0" stroke="url(#gh)" stroke-width="2" fill="none" class="trace2"/>
+  <text class="lbl" x="258" y="206" text-anchor="middle">actions</text>
+  <path d="M287 117 C 307 117, 307 130, 329 132" stroke="#3a3a3e" stroke-width="1.5" fill="none" opacity="0.5"/>
+  <circle r="3" fill="url(#gh)" opacity="1.0"><animateMotion dur="2.0s" begin="0.0s" repeatCount="indefinite" path="M287 117 C 307 117, 307 130, 329 132" calcMode="spline" keyTimes="0;1" keySplines="0.4 0 0.2 1"/></circle>
+  <path d="M275 184 C 309 184, 309 150, 329 146" stroke="#3a3a3e" stroke-width="1.5" fill="none" opacity="0.5"/>
+  <circle r="3" fill="url(#gh)" opacity="1.0"><animateMotion dur="2.0s" begin="0.3s" repeatCount="indefinite" path="M275 184 C 309 184, 309 150, 329 146" calcMode="spline" keyTimes="0;1" keySplines="0.4 0 0.2 1"/></circle>
+  <g class="pulse p1"><rect x="329" y="110" width="66" height="56" rx="13" fill="rgba(92,124,255,0.12)" stroke="url(#gh)" stroke-width="1.8"/></g><text class="cap2" x="362.0" y="137.0" text-anchor="middle" fill="url(#gh)">forward</text><text class="cap2" x="362.0" y="153.0" text-anchor="middle" fill="url(#gh)">dyn.</text>
+  <path d="M395 138 C 409 138, 409 138, 418 138" stroke="#3a3a3e" stroke-width="1.5" fill="none" opacity="0.5"/>
+  <circle r="3" fill="url(#gh)" opacity="1.0"><animateMotion dur="1.8s" begin="0.9s" repeatCount="indefinite" path="M395 138 C 409 138, 409 138, 418 138" calcMode="spline" keyTimes="0;1" keySplines="0.4 0 0.2 1"/></circle>
+  <rect x="446" y="104" width="14" height="28" rx="2" fill="rgba(124,92,255,0.08)" stroke="#3a3a3e" stroke-width="1.1"/>
+  <rect x="462" y="104" width="14" height="28" rx="2" fill="rgba(124,92,255,0.08)" stroke="#3a3a3e" stroke-width="1.1"/>
+  <rect x="478" y="104" width="14" height="28" rx="2" fill="rgba(124,92,255,0.08)" stroke="#3a3a3e" stroke-width="1.1"/>
+  <rect class="scan2" x="446" y="104" width="10" height="28" rx="2" fill="url(#gh)" opacity="0.3"/>
+  <text class="lbl" x="470" y="150" text-anchor="middle">video</text>
+  <path d="M496 118 C 518 118, 518 134, 540 138" stroke="#3a3a3e" stroke-width="1.5" fill="none" opacity="0.5"/>
+  <circle r="3" fill="url(#gh)" opacity="1.0"><animateMotion dur="2.0s" begin="0.0s" repeatCount="indefinite" path="M496 118 C 518 118, 518 134, 540 138" calcMode="spline" keyTimes="0;1" keySplines="0.4 0 0.2 1"/></circle>
+  <g class="pulse p2"><rect x="540" y="112" width="66" height="56" rx="13" fill="rgba(92,124,255,0.12)" stroke="url(#gh)" stroke-width="1.8"/></g><text class="cap2" x="573.0" y="139.0" text-anchor="middle" fill="url(#gh)">inverse</text><text class="cap2" x="573.0" y="155.0" text-anchor="middle" fill="url(#gh)">dyn.</text>
+  <path d="M606 140 C 618 140, 618 140, 626 140" stroke="#3a3a3e" stroke-width="1.5" fill="none" opacity="0.5"/>
+  <circle r="3" fill="url(#gh)" opacity="1.0"><animateMotion dur="1.8s" begin="0.9s" repeatCount="indefinite" path="M606 140 C 618 140, 618 140, 626 140" calcMode="spline" keyTimes="0;1" keySplines="0.4 0 0.2 1"/></circle>
+  <path class="trace2" d="M626 150 L634 134 L644 142 L654 128 L664 138" stroke="url(#gh)" stroke-width="2.2" fill="none" stroke-linecap="round"/>
+  <text class="lbl" x="211" y="104" text-anchor="start">video</text>
+  <text class="lbl" x="211" y="172" text-anchor="start">actions</text>
+  <text class="lbl" x="418" y="130" text-anchor="start">video</text>
+  <text class="lbl" x="622" y="170" text-anchor="start">actions</text>
+</svg>
