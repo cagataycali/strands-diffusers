@@ -77,3 +77,14 @@ def test_mesh_serialization_no_data_loss():
     # the serialized result must NOT contain an opaque object repr
     s = str(out["result"])
     assert "object at 0x" not in s, "mesh fell through to repr string (data loss)"
+
+
+def test_modular_pipeline_run_gives_actionable_error():
+    """run path must reject Modular pipelines with guidance, not silently fail."""
+    from strands_diffusers import use_diffusers
+    r = use_diffusers(action="run", pipeline="FluxModularPipeline",
+                      model="black-forest-labs/FLUX.1-schnell",
+                      parameters={"prompt": "x"})
+    assert r["status"] == "error"
+    txt = r["content"][0]["text"]
+    assert "Modular" in txt and ("load_components" in txt or "action='call'" in txt)

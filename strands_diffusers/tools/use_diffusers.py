@@ -117,6 +117,7 @@ def use_diffusers(
             inspect      — signature + docstring of any `target`
             cache        — list cached pipelines/objects
             clear_cache  — free a `cache_key` (or everything)
+            visualize    — render a robot action chunk to plots + an animation (SEE it)
         pipeline: diffusers pipeline class name for action="run" (e.g.
                   "StableDiffusionPipeline", "Cosmos3OmniPipeline"). Use
                   "DiffusionPipeline"/"AutoPipelineForText2Image" for auto-detect.
@@ -210,12 +211,56 @@ def use_diffusers(
             n = engine.cache_clear(cache_key)
             return _ok(f"🧹 cleared {n} object(s)")
 
+        if action == "visualize":
+            # Turn a robot ACTION chunk into plots + an animation you can watch.
+            # `target` may be a path to an action .json artifact, or pass the raw
+            # action via `inputs` (nested list / serialized dict).
+            from strands_diffusers.core import viz
+            act = inputs
+            if act is None and target:
+                if target.startswith("cached:"):
+                    act = _resolve_target(target)
+                else:
+                    with open(target) as f:
+                        act = json.load(f)
+            if act is None:
+                return _err("Provide an action via `inputs` (list/dict) or `target` "
+                            "(path to an action .json, or cached:key).")
+            vp = params or {}
+            res = viz.visualize_action(
+                act,
+                save_prefix=vp.get("save_prefix", "action"),
+                interpret_xyz=vp.get("interpret_xyz", True),
+                gripper_index=vp.get("gripper_index", -1),
+                cumulative_xyz=vp.get("cumulative_xyz", True),
+                world_video=vp.get("world_video"),
+                fps=int(vp.get("fps", fps)),
+                dim_labels=vp.get("dim_labels"),
+            )
+            arts = res["artifacts"]
+            head = "🎬 action visualization\n📎 artifacts:\n" + "\n".join(
+                f"  • {a}" for a in arts)
+            return _ok(f"{head}\n{json.dumps(res['summary'], indent=2)}",
+                       data=res["summary"], artifacts=arts)
+
         # ───────── run (pipeline) ─────────
         if action == "run":
             if not pipeline:
                 return _err("Provide `pipeline` (a class name). Use action='pipelines'.")
             if not model:
                 return _err("Provide `model` (HF repo id or local path).")
+            # Modular pipelines have a different lifecycle: from_pretrained loads
+            # CONFIG ONLY, components must be loaded via load_components(), and
+            # __call__(state, output) takes a PipelineState — not prompt=... So the
+            # generic run path (from_pretrained -> .to() -> pipe(**kwargs)) won't work.
+            if pipeline.endswith("ModularPipeline"):
+                return _err(
+                    f"'{pipeline}' is a Modular pipeline with a different lifecycle "
+                    "(from_pretrained loads config only; call load_components() then "
+                    "invoke with a PipelineState, not prompt=...). The high-level "
+                    "`run` path doesn't support Modular pipelines yet. Use action='call' "
+                    "to drive it manually, or pick the non-modular variant "
+                    f"(e.g. '{pipeline.replace('Modular','')}').")
             _ensure("diffusers")
             from_pretrained_kwargs = params.pop("from_pretrained_kwargs", {}) \
                 if isinstance(params, dict) else {}
@@ -271,7 +316,7 @@ def use_diffusers(
 
         return _err(f"Unknown action '{action}'. Try: pipelines, models, schedulers, "
                     f"tasks, modalities, wfm, pipeline_info, inspect, run, call, "
-                    f"cache, clear_cache.")
+                    f"visualize, cache, clear_cache.")
 
     except TypeError as e:
         hint = ""
