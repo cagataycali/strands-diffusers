@@ -74,6 +74,18 @@ def main() -> int:
                 res.get("action", {}).get("chunk_shape") == [16, 7]
                 and any(a.endswith(".json") for a in out.get("artifacts", [])))
 
+    # 5. action visualization → plots + animation artifacts
+    r = use_diffusers(action="visualize",
+                      inputs=[[[0.1 * i, -0.1 * i, 0.05, 0, 0, 0, 1.0]
+                               for i in range(16)]],
+                      parameters={"save_prefix": "smoke_action", "fps": 5})
+    arts = r.get("artifacts", [])
+    ok &= check("action visualization → timeseries + trajectory + animation",
+                r["status"] == "success"
+                and any(a.endswith("timeseries_" + a.rsplit("_", 1)[1]) or "timeseries" in a for a in arts)
+                and any("animation" in a for a in arts)
+                and any("trajectory" in a for a in arts))
+
     print("\n" + ("🎉 ALL SMOKE CHECKS PASSED" if ok else "💥 SMOKE FAILED"))
     return 0 if ok else 1
 
