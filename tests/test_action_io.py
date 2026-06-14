@@ -212,3 +212,52 @@ def test_sample_rate_inferred_from_backbone():
     assert _infer_sample_rate(type("P", (), {"transformer": tr})()) == 44100
     # no audio hints anywhere → default
     assert _infer_sample_rate(type("P", (), {})()) == 16000
+
+
+def test_action_non_finite_emits_strict_json(tmp_path):
+    """A WFM action chunk can carry NaN (guidance blow-up) or +/-Inf (fp16
+    overflow). Python's lenient json writes bare NaN/Infinity tokens that EVERY
+    strict / cross-language parser (JS JSON.parse, Go, Rust serde_json, jq)
+    rejects -- breaking the very robot-controller handoff the .json artifact
+    exists for. The serializer must emit spec-compliant JSON (non-finite -> null),
+    preserve finite values exactly, and surface the anomaly via a non_finite count."""
+    a = np.array([[0.1, np.nan, 2.0], [np.inf, 0.0, -np.inf]], dtype=np.float64)  # [T=2,dim=3]
+    out = io.serialize_output(_mock_output([a]), save_artifacts=True)
+    act = out["result"]["action"]
+    assert act["non_finite"] == 3, "must count every non-finite value"
+
+    # the on-disk artifact must parse under a STRICT (no-constant) JSON reader
+    p = [x for x in out["artifacts"] if x.endswith(".json")][0]
+    raw = open(p).read()
+    assert "NaN" not in raw and "Infinity" not in raw, f"unparseable tokens in artifact: {raw}"
+
+    def _reject(tok):
+        raise ValueError(f"non-finite token: {tok}")
+    data = json.loads(raw, parse_constant=_reject)  # raises if NaN/Infinity present
+
+    # finite values preserved exactly; non-finite -> null (None)
+    assert data[0][0] == [0.1, None, 2.0]
+    assert data[0][1] == [None, 0.0, None]
+
+    # the in-memory result dict must also be strict-JSON-safe
+    json.dumps(out["result"], allow_nan=False)
+
+
+def test_action_all_finite_has_no_non_finite_flag():
+    """The non_finite flag must be absent for clean chunks (no false alarms)."""
+    a = np.array([[0.5, -0.5, 1.0, -1.0, 0.0, 0.25, -0.25]], dtype=np.float64)
+    out = io.serialize_output(_mock_output([a]), save_artifacts=False)
+    assert "non_finite" not in out["result"]["action"]
+    np.testing.assert_allclose(np.asarray(out["result"]["action"]["data"][0]), a, rtol=1e-6)
+
+
+def test_ensure_json_safe_normalizes_non_finite():
+    """_ensure_json_safe must catch non-finite floats anywhere in the payload (not
+    just the action path) -- json.dumps accepts them by default, so the prior
+    check was a no-op. They must normalize to None and the result stay strict-safe."""
+    payload = {"a": float("nan"), "b": [1.0, float("inf"), float("-inf")], "c": "ok"}
+    safe = io._ensure_json_safe(payload)
+    assert safe["a"] is None
+    assert safe["b"] == [1.0, None, None]
+    assert safe["c"] == "ok"
+    json.dumps(safe, allow_nan=False)

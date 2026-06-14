@@ -286,9 +286,26 @@ def _serialize_action(val, artifacts, save):
     """
     import numpy as np
 
+    # Non-finite action values (NaN from a guidance blow-up, +/-Inf from an fp16
+    # overflow) must not leak into the .json artifact as bare NaN/Infinity tokens:
+    # those are valid for Python's lenient json but REJECTED by every strict /
+    # cross-language parser (JS JSON.parse, Go encoding/json, Rust serde_json, jq)
+    # -- exactly the robot-controller handoff this artifact exists for. Convert
+    # them to JSON null (the natural "no value") so the file parses in any
+    # language, and count them so the anomaly is surfaced, not silently masked.
+    n_non_finite = 0
+
     def _one(t):
+        nonlocal n_non_finite
         a = _tensor_to_numpy(t)
-        return np.asarray(a).tolist() if a is not None else None
+        if a is None:
+            return None
+        a = np.asarray(a, dtype=float)
+        bad = ~np.isfinite(a)
+        if bad.any():
+            n_non_finite += int(bad.sum())
+            return np.where(bad, None, a).tolist()  # non-finite -> None (JSON null)
+        return a.tolist()
 
     if isinstance(val, (list, tuple)):
         data = [_one(t) for t in val]
@@ -296,6 +313,8 @@ def _serialize_action(val, artifacts, save):
         data = _one(val)
 
     result = {"type": "action", "data": data}
+    if n_non_finite:
+        result["non_finite"] = n_non_finite
     if isinstance(val, (list, tuple)) and val:
         first = _tensor_to_numpy(val[0])
         if first is not None:
@@ -305,7 +324,9 @@ def _serialize_action(val, artifacts, save):
         import json
         path = ARTIFACT_DIR / f"action_{_stamp()}.json"
         with open(path, "w") as f:
-            json.dump(data, f)
+            # allow_nan=False is the spec-compliance guard: it raises on any
+            # residual non-finite float rather than writing an unparseable token.
+            json.dump(data, f, allow_nan=False)
         artifacts.append(str(path))
         result["path"] = str(path)
     return result
@@ -541,8 +562,15 @@ def _save_wav(audio, sampling_rate: int) -> str:
 
 def _ensure_json_safe(obj: Any) -> Any:
     import json as _json
+
+    # allow_nan=False makes json.dumps the validity oracle for non-finite floats
+    # too (it accepts NaN/Infinity by default, so the old check was a no-op for
+    # them). A non-finite scalar is normalized to None (JSON null) so the result
+    # dict is spec-compliant across languages, matching the action-artifact path.
+    if isinstance(obj, float) and (obj != obj or obj in (float("inf"), float("-inf"))):
+        return None  # NaN or +/-Inf -> JSON null
     try:
-        _json.dumps(obj)
+        _json.dumps(obj, allow_nan=False)
         return obj
     except (TypeError, ValueError):
         if isinstance(obj, dict):
