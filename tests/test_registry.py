@@ -47,3 +47,8 @@ def test_pipeline_info_soft_error_for_from_source_wfm():
     assert "from-source" in info["note"] or "diffusers" in info["note"]
     # a genuine typo still returns None (-> hard error, correctly)
     assert r.pipeline_info("DoesNotExistPipeline") is None
+
+
+def test_shape_3d_modality():
+    assert r.modality_of("ShapEPipeline") == "3d"
+    assert r.modality_of("ShapEImg2ImgPipeline") in ("3d", "image-to-image")

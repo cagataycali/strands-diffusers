@@ -145,6 +145,11 @@ def _serialize(obj: Any, artifacts: List[str], save: bool, ctx: Dict[str, Any],
     if handled is not None:
         return handled
 
+    # 3D mesh (ShapE / mesh-output pipelines) → .ply/.obj
+    mesh = _maybe_mesh(obj, artifacts, save)
+    if mesh is not None:
+        return mesh
+
     # PIL image
     pil = _maybe_pil(obj, artifacts, save)
     if pil is not None:
@@ -187,6 +192,10 @@ def _maybe_pipeline_output(obj, artifacts, save, ctx, depth):
     cls = type(obj).__name__
     if not cls.endswith("PipelineOutput") and not cls.endswith("Output"):
         return None
+    # A mesh decoder output (verts/faces) is an *Output too — route to mesh export
+    # before generic field-by-field serialization (else 3D data is lost).
+    if hasattr(obj, "verts") and hasattr(obj, "faces"):
+        return _maybe_mesh(obj, artifacts, save)
     # Gather public fields (dataclass-style or attrs).
     fields = {}
     if hasattr(obj, "__dataclass_fields__"):
@@ -280,6 +289,70 @@ def _serialize_action(val, artifacts, save):
         artifacts.append(str(path))
         result["path"] = str(path)
     return result
+
+
+def _maybe_mesh(obj, artifacts, save):
+    """A 3D mesh (ShapE MeshDecoderOutput / trimesh-like) → .ply (+ .obj).
+
+    diffusers mesh outputs expose `verts` and `faces`; diffusers.utils ships
+    export_to_ply / export_to_obj. Without this path a mesh would serialize to an
+    opaque repr string (silent 3D data loss).
+    """
+    # NB: diffusers BaseOutput subclasses OrderedDict, so DON'T exclude dict here —
+    # detect by the verts/faces attributes instead.
+    if obj is None or isinstance(obj, (str, int, float, bool, list, tuple)):
+        return None
+    if not (hasattr(obj, "verts") and hasattr(obj, "faces")):
+        return None
+    nv = _safe_len(getattr(obj, "verts", None))
+    nf = _safe_len(getattr(obj, "faces", None))
+    info = {"type": "mesh", "num_verts": nv, "num_faces": nf}
+    if save:
+        path = _save_mesh(obj)
+        if path:
+            artifacts.append(path)
+            info["path"] = path
+    return info
+
+
+def _safe_len(x):
+    try:
+        if x is None:
+            return None
+        if hasattr(x, "shape"):
+            return int(x.shape[0])
+        return len(x)
+    except Exception:
+        return None
+
+
+def _save_mesh(mesh) -> Optional[str]:
+    """Write a mesh → .ply via diffusers.utils.export_to_ply (obj fallback)."""
+    ts = int(time.time() * 1000)
+    try:
+        from diffusers.utils import export_to_ply
+        path = ARTIFACT_DIR / f"mesh_{ts}.ply"
+        export_to_ply(mesh, str(path))
+        return str(path)
+    except Exception:
+        pass
+    try:
+        from diffusers.utils import export_to_obj
+        path = ARTIFACT_DIR / f"mesh_{ts}.obj"
+        export_to_obj(mesh, str(path))
+        return str(path)
+    except Exception:
+        pass
+    # last resort: dump raw verts/faces as npz so data isn't lost
+    try:
+        import numpy as np
+        path = ARTIFACT_DIR / f"mesh_{ts}.npz"
+        v = _tensor_to_numpy(mesh.verts)
+        fa = _tensor_to_numpy(mesh.faces)
+        np.savez(str(path), verts=v, faces=fa)
+        return str(path)
+    except Exception:
+        return None
 
 
 def _maybe_pil(obj, artifacts, save):

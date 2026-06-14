@@ -56,3 +56,24 @@ def test_action_values_preserved():
     out = io.serialize_output(_mock_output([a]), save_artifacts=False)
     got = np.asarray(out["result"]["action"]["data"][0])
     np.testing.assert_allclose(got, a, rtol=1e-5)
+
+
+def test_mesh_serialization_no_data_loss():
+    """ShapE-style mesh output (verts/faces) must export to .ply/.obj/.npz, not
+    serialize to an opaque repr string (the silent 3D data-loss bug)."""
+    # Use the REAL diffusers mesh output class (its name ends with 'Output', which
+    # an earlier naive mock missed — that path must still route to mesh export).
+    import torch
+    from diffusers.pipelines.shap_e.renderer import MeshDecoderOutput
+    meshes = [MeshDecoderOutput(verts=torch.randn(100, 3),
+                                faces=torch.randint(0, 100, (50, 3)),
+                                vertex_channels=None) for _ in range(2)]
+    out = io.serialize_output(
+        type("ShapEPipelineOutput", (), {"images": meshes})(),
+        save_artifacts=True)
+    arts = out.get("artifacts", [])
+    assert any(a.endswith((".ply", ".obj", ".npz")) for a in arts), \
+        f"mesh produced no 3D artifact: {arts}"
+    # the serialized result must NOT contain an opaque object repr
+    s = str(out["result"])
+    assert "object at 0x" not in s, "mesh fell through to repr string (data loss)"

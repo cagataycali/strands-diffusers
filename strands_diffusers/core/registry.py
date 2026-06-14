@@ -138,6 +138,8 @@ _MODALITY_RULES = (
      r"Marigold|VisualCloze", "image"),
     # Architecture-named audio families.
     (r"AudioLDM|StableAudio|MusicGen|Musicgen|AceStep|Dance|Spectrogram", "audio"),
+    # 3D / mesh generation (ShapE, etc.) — emits meshes, not images.
+    (r"ShapE|Shap[_-]?E|Mesh|TripoSR|Hunyuan3D|TRELLIS", "3d"),
     (r"Image", "image"),
 )
 
