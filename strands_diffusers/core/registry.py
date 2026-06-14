@@ -106,6 +106,7 @@ def auto_pipeline_tasks() -> Dict[str, Dict[str, str]]:
 # Ordered (pattern → modality) rules applied to a pipeline class name. First match
 # wins. Purely name-derived so new pipelines slot in without code changes.
 _MODALITY_RULES = (
+    # Explicit transition names first (most specific).
     (r"TextToImage|Text2Image", "text-to-image"),
     (r"TextToVideo|Text2Video|TextToWorld", "text-to-video"),
     (r"ImageToVideo|Image2Video", "image-to-video"),
@@ -114,8 +115,12 @@ _MODALITY_RULES = (
     (r"ImageToImage|Image2Image", "image-to-image"),
     (r"Inpaint", "inpainting"),
     (r"Upscale|SuperResolution", "upscaling"),
-    (r"TextToAudio|Text2Audio|Audio|Music|Speech|TTS|Bark|MusicGen", "audio"),
-    (r"Video|Animate|Cosmos|Wan|Hunyuan|Mochi|Allegro|LTX|SkyReels|CogVideo", "video"),
+    (r"TextToAudio|Text2Audio|Audio|Music|Speech|TTS|Bark|MusicGen|Stable[Aa]udio", "audio"),
+    # Image families that share a name-stem with a video family (e.g. HunyuanDiT,
+    # HunyuanImage) — classify as image BEFORE the broad video catch-all below.
+    (r"DiT|HunyuanImage|HunyuanDiT", "image"),
+    # Broad video/world model families (named after the architecture, not a task).
+    (r"Video|Animate|Cosmos|Wan|Hunyuan|Mochi|Allegro|LTX|SkyReels|CogVideo|Latte|Genie", "video"),
     (r"ControlNet|Adapter|IP", "controlled-image"),
     (r"Image", "image"),
 )
