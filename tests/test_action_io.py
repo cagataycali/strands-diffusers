@@ -170,3 +170,28 @@ def test_output_path_not_coerced_idempotent(tmp_path):
     open(out, "wb").write(b"fake-existing")  # path now exists
     kw = m._coerce_kwargs({"video_frames": "ignore", "output_video_path": out})
     assert kw["output_video_path"] == out, "output path must stay a string, not be loaded"
+
+
+def test_artifact_filenames_collision_free():
+    """Millisecond timestamps collide in tight loops / batched generation, silently
+    overwriting artifacts. _stamp() appends an atomic counter. Regression: 30 rapid
+    saves once yielded only 6 unique paths."""
+    from PIL import Image
+    paths = []
+    for _ in range(40):
+        out = io.serialize_output(
+            type("ImagePipelineOutput", (), {"images": [Image.new("RGB", (8, 8))]})(),
+            save_artifacts=True)
+        paths += out.get("artifacts", [])
+    assert len(paths) == len(set(paths)) == 40, f"collisions: {len(paths)-len(set(paths))}"
+
+
+def test_batched_images_each_saved():
+    """A single output with num_images_per_prompt>1 must persist EVERY image."""
+    from PIL import Image
+    out = io.serialize_output(
+        type("ImagePipelineOutput", (),
+             {"images": [Image.new("RGB", (8, 8), (i * 40, 0, 0)) for i in range(4)]})(),
+        save_artifacts=True)
+    arts = [a for a in out.get("artifacts", []) if a.endswith(".png")]
+    assert len(arts) == 4 and len(set(arts)) == 4, f"batch lost images: {arts}"

@@ -28,6 +28,22 @@ ARTIFACT_DIR = Path(
 ARTIFACT_DIR.mkdir(parents=True, exist_ok=True)
 
 
+import itertools as _itertools
+import threading as _threading
+
+_STAMP_LOCK = _threading.Lock()
+_STAMP_COUNTER = _itertools.count()
+
+
+def _stamp() -> str:
+    """Monotonic, collision-free artifact stamp: <ms>_<counter>. Millisecond
+    timestamps alone collide in tight loops / batched generation (num_images>1),
+    silently overwriting artifacts — so append an atomic process-wide counter."""
+    with _STAMP_LOCK:
+        n = next(_STAMP_COUNTER)
+    return f"{int(time.time() * 1000)}_{n}"
+
+
 # ───────────────────────── INPUT COERCION ─────────────────────────
 
 def coerce_input(value: Any) -> Any:
@@ -287,7 +303,7 @@ def _serialize_action(val, artifacts, save):
             result["num_chunks"] = len(val)
     if save and data is not None:
         import json
-        path = ARTIFACT_DIR / f"action_{int(time.time()*1000)}.json"
+        path = ARTIFACT_DIR / f"action_{_stamp()}.json"
         with open(path, "w") as f:
             json.dump(data, f)
         artifacts.append(str(path))
@@ -332,7 +348,7 @@ def _safe_len(x):
 
 def _save_mesh(mesh) -> Optional[str]:
     """Write a mesh → .ply via diffusers.utils.export_to_ply (obj fallback)."""
-    ts = int(time.time() * 1000)
+    ts = _stamp()
     try:
         from diffusers.utils import export_to_ply
         path = ARTIFACT_DIR / f"mesh_{ts}.ply"
@@ -465,14 +481,14 @@ def _to_frame_list(val):
 # ───────────────────────── artifact writers ─────────────────────────
 
 def _save_image(image) -> str:
-    path = ARTIFACT_DIR / f"image_{int(time.time()*1000)}.png"
+    path = ARTIFACT_DIR / f"image_{_stamp()}.png"
     image.save(str(path))
     return str(path)
 
 
 def _save_video(frames, fps: float) -> Optional[str]:
     """Write frames → mp4. Prefer diffusers.export_to_video, fall back to imageio."""
-    path = ARTIFACT_DIR / f"video_{int(time.time()*1000)}.mp4"
+    path = ARTIFACT_DIR / f"video_{_stamp()}.mp4"
     try:
         from PIL import Image
         pil_frames = [Image.fromarray(f) for f in frames]
@@ -490,7 +506,7 @@ def _save_video(frames, fps: float) -> Optional[str]:
     # last resort: dump frames as a gif (always available via PIL)
     try:
         from PIL import Image
-        gif = ARTIFACT_DIR / f"video_{int(time.time()*1000)}.gif"
+        gif = ARTIFACT_DIR / f"video_{_stamp()}.gif"
         imgs = [Image.fromarray(f) for f in frames]
         imgs[0].save(str(gif), save_all=True, append_images=imgs[1:],
                      duration=int(1000 / max(fps, 1)), loop=0)
@@ -505,7 +521,7 @@ def _save_wav(audio, sampling_rate: int) -> str:
     a = np.asarray(audio, dtype=np.float32)
     if a.ndim > 1:
         a = a.squeeze()
-    path = ARTIFACT_DIR / f"audio_{int(time.time()*1000)}.wav"
+    path = ARTIFACT_DIR / f"audio_{_stamp()}.wav"
     try:
         import soundfile as sf
         sf.write(str(path), a, int(sampling_rate))

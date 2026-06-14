@@ -97,7 +97,8 @@ def visualize_action(
     g_idx = (gripper_index % dim) if (gripper_index is not None) else None
 
     artifacts: List[str] = []
-    ts = int(time.time() * 1000)
+    from strands_diffusers.core.io import _stamp
+    ts = _stamp()
 
     # ── 1. time-series ──────────────────────────────────────────────
     fig, ax = plt.subplots(figsize=(10, 5))
