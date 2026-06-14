@@ -22,6 +22,12 @@ class dynamically, so it works the moment your diffusers has it).
 
 Reference: https://huggingface.co/docs/diffusers/main/en/api/pipelines/cosmos3
 
+VERIFIED E2E (NVIDIA Thor, diffusers 0.39.0.dev0, Cosmos3-Nano bf16/cuda):
+  • world video  → .mp4  shape (17, 480, 640, 3)
+  • robot action → .json shape (1, 16, 10)  = (num_chunks, T, action_dim),
+                   normalized action space, values in [-1, 1].
+  Both produced by ONE use_diffusers(action="run", ...) call.
+
 Run directly (needs a GPU + ~33GB Cosmos3-Nano weights):
     python examples/cosmos_action_policy.py
 """

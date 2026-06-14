@@ -31,6 +31,13 @@ future video — it predicts the **robot action chunk** that produces it. A sing
 
 — all surfaced as artifact paths, ready to hand to a robot controller or the user.
 
+> **Verified end-to-end** on NVIDIA Thor (diffusers `0.39.0.dev0`, `nvidia/Cosmos3-Nano`,
+> bf16/cuda): one `use_diffusers(action="run", pipeline="Cosmos3OmniPipeline", ...)`
+> call produced a world video `(17, 480, 640, 3)` **and** a robot action chunk
+> `(1, 16, 10)` = `(num_chunks, T, action_dim)`, normalized to `[-1, 1]`.
+> See [`examples/cosmos_action_policy.py`](examples/cosmos_action_policy.py) and
+> [`examples/SETUP_COSMOS.md`](examples/SETUP_COSMOS.md).
+
 ## Install
 
 ```bash
