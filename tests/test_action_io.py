@@ -113,3 +113,16 @@ def test_visualize_accepts_json_string_action():
         r = use_diffusers(action="visualize", parameters={"fps": 5}, **{via: js})
         assert r["status"] == "success", f"{via}: {r['content'][0]['text'][:120]}"
         assert len(r.get("artifacts", [])) >= 2
+
+
+def test_parameters_accepts_json_string():
+    """LLM tool-calls may serialize `parameters` to a JSON string. The tool must
+    parse it (not crash in dict(str)), and reject true garbage with a clear error."""
+    from strands_diffusers import use_diffusers
+    # discovery action needs no model; just exercise the parameters parsing path
+    r = use_diffusers(action="inspect", target="utils.export_to_video",
+                      parameters='{"unused": 1}')
+    assert r["status"] == "success"
+    bad = use_diffusers(action="inspect", target="utils.export_to_video",
+                        parameters="not json at all")
+    assert bad["status"] == "error" and "parameters" in bad["content"][0]["text"]

@@ -141,6 +141,16 @@ def use_diffusers(
         Dict with status + content; "run"/"call" also include "data" (JSON-safe
         result) and "artifacts" (paths to generated media + action JSON).
     """
+    # LLM tool-calls may serialize the `parameters` object to a JSON string;
+    # also accept that gracefully (else dict(str) raises a cryptic ValueError).
+    if isinstance(parameters, str):
+        try:
+            parameters = json.loads(parameters)
+        except (ValueError, TypeError):
+            return _err("`parameters` must be a JSON object/dict; got an "
+                        f"unparseable string: {parameters[:120]!r}")
+    if parameters is not None and not isinstance(parameters, dict):
+        return _err(f"`parameters` must be a dict, got {type(parameters).__name__}.")
     params = dict(parameters or {})
     try:
         # ───────── discovery ─────────
