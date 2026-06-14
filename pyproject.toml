@@ -1,0 +1,64 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "strands-diffusers"
+version = "0.1.0"
+description = "The universal entrypoint to HuggingFace diffusers for Strands agents — 100% pipeline & modality coverage, zero hardcoding. Special focus on Physical-AI world-foundation models (Cosmos) with robot action outputs."
+readme = "README.md"
+requires-python = ">=3.10"
+license = {text = "MIT"}
+authors = [
+    {name = "Cagatay Cali", email = "cagataycali@icloud.com"}
+]
+keywords = [
+    "strands", "diffusers", "huggingface", "ai", "agents", "diffusion",
+    "video", "image", "vla", "wfm", "world-foundation-model", "cosmos",
+    "robotics", "physical-ai"
+]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+]
+
+dependencies = [
+    "strands-agents",
+    "diffusers>=0.30",
+    "transformers>=4.40",
+    "torch",
+    "pillow",
+    "numpy",
+    "accelerate",
+]
+
+[project.optional-dependencies]
+video = ["imageio[ffmpeg]", "opencv-python", "av"]
+audio = ["soundfile", "librosa"]
+cosmos = ["cosmos_guardrail"]
+dev = ["pytest>=7.0", "black", "ruff"]
+all = ["strands-diffusers[video,audio,dev]"]
+
+[project.urls]
+Homepage = "https://github.com/cagataycali/strands-diffusers"
+Repository = "https://github.com/cagataycali/strands-diffusers"
+Issues = "https://github.com/cagataycali/strands-diffusers/issues"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["strands_diffusers*"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py310"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "W"]
+ignore = ["E501"]
