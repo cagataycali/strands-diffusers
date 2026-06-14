@@ -143,3 +143,18 @@ def test_cached_reference_threading():
     engine._CACHE["bundle"] = {"a": 1, "b": 2}
     assert m._resolve_target("cached:bundle") == {"a": 1, "b": 2}
     engine.cache_clear("cond"); engine.cache_clear("bundle")
+
+
+def test_run_inputs_does_not_json_parse_strings():
+    """DELIBERATE BOUNDARY: unlike `visualize` (inputs must be an action array),
+    run/call `inputs` is a rarely-used positional convenience where a string is
+    far more likely a PROMPT than a serialized array. It must NOT be auto-JSON-
+    parsed — structured args belong in `parameters` (which IS parsed). This test
+    documents+guards that boundary so a future 'fix' doesn't mangle prompts."""
+    import importlib
+    m = importlib.import_module("strands_diffusers.tools.use_diffusers")
+    assert m._coerce_param("a robot in a kitchen") == "a robot in a kitchen"
+    # a JSON-looking string is preserved verbatim (not parsed into a list)
+    assert m._coerce_param("[[1,2,3]]") == "[[1,2,3]]"
+    # real lists still pass through untouched
+    assert m._coerce_param([[1, 2, 3]]) == [[1, 2, 3]]
