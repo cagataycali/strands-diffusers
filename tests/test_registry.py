@@ -52,3 +52,26 @@ def test_pipeline_info_soft_error_for_from_source_wfm():
 def test_shape_3d_modality():
     assert r.modality_of("ShapEPipeline") == "3d"
     assert r.modality_of("ShapEImg2ImgPipeline") in ("3d", "image-to-image")
+
+
+def test_hybrid_doc_fallback_shrinks_other_safely():
+    """Doc fallback (use_doc=True) must rescue 'other' WITHOUT mislabeling any
+    video/WFM pipeline into a still-image bucket."""
+    name_other = [p for p in r.pipelines() if r.modality_of(p) == "other"]
+    hybrid_other = [p for p in r.pipelines() if r.modality_of(p, use_doc=True) == "other"]
+    assert len(hybrid_other) < len(name_other), "doc fallback should shrink 'other'"
+    # the WFM/video guard must still hold under the hybrid classifier
+    for p in r.pipelines():
+        m = r.modality_of(p, use_doc=True)
+        if any(k in p for k in ("I2V", "T2V", "V2V", "VideoToWorld",
+                                "TextToVideo", "ImageToVideo")):
+            assert m not in ("image", "image-to-image", "text-to-image", "inpainting"), \
+                f"{p} mislabeled {m} by hybrid"
+
+
+def test_modality_of_default_is_name_only_deterministic():
+    """Default modality_of must NOT import classes (fast, deterministic for tests)."""
+    assert r.modality_of("StableDiffusionPipeline") == "image"
+    # a name-only 'other' stays 'other' without use_doc
+    assert r.modality_of("LDMPipeline") == "other"
+    assert r.modality_of("LDMPipeline", use_doc=True) == "image"

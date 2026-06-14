@@ -144,17 +144,62 @@ _MODALITY_RULES = (
 )
 
 
-def modality_of(pipeline_name: str) -> str:
-    for pat, mod in _MODALITY_RULES:
-        if re.search(pat, pipeline_name):
+# Docstring phrasings → modality. Used ONLY as a fallback when name-rules yield
+# "other". Rules stay authoritative (they encode WFM/inpaint precedence the docs
+# lack); the doc parser just rescues the long tail. Ordered: most-specific first.
+_DOC_MODALITY = (
+    ("text-to-3d", "3d"), ("image-to-3d", "3d"), ("text-to-mesh", "3d"),
+    ("image-to-image", "image-to-image"),
+    ("image-to-video", "image-to-video"),
+    ("video-to-video", "video-to-video"),
+    ("text-to-video", "text-to-video"),
+    ("text-to-image", "text-to-image"),
+    ("text-to-audio", "audio"), ("text-to-speech", "audio"),
+    ("super-resolution", "upscaling"),
+    ("inpainting", "inpainting"),
+    ("unconditional image", "image"), ("class-conditional image", "image"),
+    ("image generation", "image"), ("image synthesis", "image"),
+    ("video generation", "video"), ("audio generation", "audio"),
+)
+
+_DOC_PAT = re.compile(
+    r"[Pp]ipeline for ([\w\- ]+?) (?:generation|synthesis|using|based|with)", re.S)
+
+
+@lru_cache(maxsize=512)
+def _modality_from_doc(name: str) -> str:
+    """Best-effort modality from a pipeline class docstring. Cached; never raises."""
+    try:
+        cls = resolve_attr(name)
+        doc = (cls.__doc__ or "").strip().lower()
+    except Exception:
+        return "other"
+    if not doc:
+        return "other"
+    m = _DOC_PAT.search(doc)
+    phrase = m.group(1).strip() if m else doc[:80]
+    for key, mod in _DOC_MODALITY:
+        if key in phrase:
             return mod
     return "other"
 
 
-def tasks_by_modality() -> Dict[str, List[str]]:
+def modality_of(pipeline_name: str, use_doc: bool = False) -> str:
+    """Derive a pipeline's modality. Name-rules are authoritative; if they yield
+    "other" and use_doc=True, fall back to docstring parsing (slower: imports the
+    class). Keep use_doc=False for hot paths / deterministic tests."""
+    for pat, mod in _MODALITY_RULES:
+        if re.search(pat, pipeline_name):
+            return mod
+    if use_doc:
+        return _modality_from_doc(pipeline_name)
+    return "other"
+
+
+def tasks_by_modality(use_doc: bool = True) -> Dict[str, List[str]]:
     groups: Dict[str, List[str]] = {}
     for p in pipelines():
-        groups.setdefault(modality_of(p), []).append(p)
+        groups.setdefault(modality_of(p, use_doc=use_doc), []).append(p)
     for v in groups.values():
         v.sort()
     return groups
