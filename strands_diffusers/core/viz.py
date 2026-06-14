@@ -30,6 +30,61 @@ from typing import Any, List, Optional
 from strands_diffusers.core.io import ARTIFACT_DIR
 
 
+def _ensure_mplot3d():
+    """Defensive import: on systems where an older apt-installed
+    `mpl_toolkits.mplot3d` shadows the modern matplotlib-bundled one
+    (namespace package conflict — common on Debian/Ubuntu when matplotlib
+    was upgraded via pip --user), force-load mplot3d directly from the
+    site-packages dir that matches the imported matplotlib AND register
+    Axes3D with matplotlib's projection registry (which only attempts the
+    import once at module-load time).
+    """
+    import sys, os, importlib, importlib.util, importlib.machinery
+
+    # If matplotlib already has the "3d" projection registered, we're done.
+    try:
+        import matplotlib
+        from matplotlib.projections import projection_registry
+        if "3d" in projection_registry._all_projection_types:
+            return True
+    except Exception:
+        return False
+
+    # Try to load mpl_toolkits.mplot3d directly from matplotlib's site-packages.
+    try:
+        mpl_dir = os.path.dirname(matplotlib.__file__)
+        sp_dir = os.path.dirname(mpl_dir)
+        mplot3d_pkg = os.path.join(sp_dir, "mpl_toolkits", "mplot3d")
+        init_path = os.path.join(mplot3d_pkg, "__init__.py")
+        if not os.path.exists(init_path):
+            return False
+
+        # Drop any stale cached modules.
+        for k in list(sys.modules):
+            if k.startswith("mpl_toolkits.mplot3d"):
+                del sys.modules[k]
+
+        loader = importlib.machinery.SourceFileLoader(
+            "mpl_toolkits.mplot3d", init_path
+        )
+        spec = importlib.util.spec_from_loader(
+            "mpl_toolkits.mplot3d", loader, origin=init_path
+        )
+        mod = importlib.util.module_from_spec(spec)
+        mod.__path__ = [mplot3d_pkg]
+        sys.modules["mpl_toolkits.mplot3d"] = mod
+        loader.exec_module(mod)
+
+        # Register Axes3D with matplotlib's projection registry (this is what
+        # matplotlib.projections.__init__ would have done if its initial
+        # import had succeeded).
+        Axes3D = mod.Axes3D
+        projection_registry.register(Axes3D)
+        return True
+    except Exception:
+        return False
+
+
 def _as_chunks(action: Any):
     """Normalize an action payload to a numpy array [num_chunks, T, action_dim]."""
     import numpy as np
@@ -130,28 +185,45 @@ def visualize_action(
         if cumulative_xyz:
             xyz = np.cumsum(xyz, axis=0)  # treat as deltas → integrated trajectory
         path_xyz = xyz
-        fig = plt.figure(figsize=(6, 5.5))
-        ax = fig.add_subplot(111, projection="3d")
-        ax.plot(xyz[:, 0], xyz[:, 1], xyz[:, 2], "-o", ms=3, lw=1.5)
-        ax.scatter(*xyz[0], c="green", s=60, label="start")
-        ax.scatter(*xyz[-1], c="red", s=60, label="end")
-        # mark gripper close/open events along the path if we have a gripper channel
-        if g_idx is not None:
-            g = flat[:, g_idx]
-            thr = (g.max() + g.min()) / 2.0
-            closed = g > thr
-            if closed.any():
-                ax.scatter(xyz[closed, 0], xyz[closed, 1], xyz[closed, 2],
-                           c="orange", s=18, alpha=0.7, label="gripper engaged")
-        ax.set_xlabel("x"); ax.set_ylabel("y"); ax.set_zlabel("z")
-        ax.set_title("End-effector path"
-                     + (" (∫ deltas)" if cumulative_xyz else " (absolute)"))
-        ax.legend(fontsize=8)
-        p_traj = ARTIFACT_DIR / f"{save_prefix}_trajectory_{ts}.png"
-        fig.tight_layout()
-        fig.savefig(p_traj, dpi=110)
-        plt.close(fig)
-        artifacts.append(str(p_traj))
+        # Defensive: ensure mplot3d is loadable on this system before trying
+        # projection="3d" (works around stale apt mpl_toolkits shadowing pip's).
+        if _ensure_mplot3d():
+            try:
+                fig = plt.figure(figsize=(6, 5.5))
+                ax = fig.add_subplot(111, projection="3d")
+                ax.plot(xyz[:, 0], xyz[:, 1], xyz[:, 2], "-o", ms=3, lw=1.5)
+                ax.scatter(*xyz[0], c="green", s=60, label="start")
+                ax.scatter(*xyz[-1], c="red", s=60, label="end")
+                # mark gripper close/open events along the path
+                if g_idx is not None:
+                    g = flat[:, g_idx]
+                    thr = (g.max() + g.min()) / 2.0
+                    closed = g > thr
+                    if closed.any():
+                        ax.scatter(xyz[closed, 0], xyz[closed, 1], xyz[closed, 2],
+                                   c="orange", s=18, alpha=0.7, label="gripper engaged")
+                ax.set_xlabel("x"); ax.set_ylabel("y"); ax.set_zlabel("z")
+                ax.set_title("End-effector path"
+                             + (" (∫ deltas)" if cumulative_xyz else " (absolute)"))
+                ax.legend(fontsize=8)
+                p_traj = ARTIFACT_DIR / f"{save_prefix}_trajectory_{ts}.png"
+                fig.tight_layout()
+                fig.savefig(p_traj, dpi=110)
+                plt.close(fig)
+                artifacts.append(str(p_traj))
+            except Exception as e:
+                # 3D rendering failed at runtime — log and continue (timeseries+animation still work).
+                import warnings
+                warnings.warn(f"3D trajectory render skipped: {e}")
+                path_xyz = None  # animation will skip 3D panel too
+        else:
+            import warnings
+            warnings.warn(
+                "mpl_toolkits.mplot3d unavailable on this system; "
+                "3D trajectory plot skipped."
+            )
+            # Ensure animation also skips the 3D panel.
+            path_xyz = None
 
     # ── 3. animation (playhead sweep, optional world video beside it) ──
     anim_path = _animate(flat, labels, g_idx, path_xyz, world_video, fps,

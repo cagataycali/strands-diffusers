@@ -62,6 +62,30 @@ def main() -> int:
                 r["status"] == "success" and r.get("artifacts")
                 and any(a.endswith((".mp4", ".gif")) for a in r["artifacts"]))
 
+    # 3b. real tiny audio diffusion → wav artifact (built from components, no download)
+    import tempfile
+    from pathlib import Path
+    import torch
+    from diffusers import DanceDiffusionPipeline, IPNDMScheduler, UNet1DModel
+    fixture = Path(tempfile.gettempdir()) / "smoke-dance-diffusion"
+    if not (fixture / "model_index.json").exists():
+        torch.manual_seed(0)
+        unet = UNet1DModel(
+            sample_size=2048, sample_rate=16000, in_channels=2, out_channels=2,
+            extra_in_channels=64, time_embedding_type="fourier",
+            use_timestep_embedding=False, flip_sin_to_cos=True,
+            block_out_channels=(32, 32, 64), mid_block_type="UNetMidBlock1D",
+            down_block_types=("DownBlock1DNoSkip", "DownBlock1D", "AttnDownBlock1D"),
+            up_block_types=("AttnUpBlock1D", "UpBlock1D", "UpBlock1DNoSkip"))
+        DanceDiffusionPipeline(unet=unet, scheduler=IPNDMScheduler()).save_pretrained(str(fixture))
+    r = use_diffusers(
+        action="run", pipeline="DanceDiffusionPipeline", model=str(fixture),
+        parameters={"num_inference_steps": 2, "audio_length_in_s": 0.05},
+        dtype="float32", save_artifacts=True)
+    ok &= check("text-to-audio E2E → wav artifact",
+                r["status"] == "success" and r.get("artifacts")
+                and any(a.endswith(".wav") for a in r["artifacts"]))
+
     # 4. action-output serializer (the WFM payload) — no model needed
     import numpy as np
     action = [np.random.randn(16, 7)]   # one chunk [T=16, action_dim=7]

@@ -84,12 +84,28 @@ def auto_pipeline_tasks() -> Dict[str, Dict[str, str]]:
 
     These are the only first-class "tasks" diffusers ships: text2image,
     image2image, inpainting. Returned as plain class-name strings.
+
+    Note: diffusers' auto_pipeline module eagerly imports many pipeline
+    submodules at load time. If the user's environment has a transformers
+    version mismatch (e.g. missing MT5Tokenizer), the import can fail.
+    We catch this and return a partial / empty result rather than raising.
     """
-    from diffusers.pipelines.auto_pipeline import (
-        AUTO_TEXT2IMAGE_PIPELINES_MAPPING,
-        AUTO_IMAGE2IMAGE_PIPELINES_MAPPING,
-        AUTO_INPAINT_PIPELINES_MAPPING,
-    )
+    try:
+        from diffusers.pipelines.auto_pipeline import (
+            AUTO_TEXT2IMAGE_PIPELINES_MAPPING,
+            AUTO_IMAGE2IMAGE_PIPELINES_MAPPING,
+            AUTO_INPAINT_PIPELINES_MAPPING,
+        )
+    except Exception as e:
+        # Surface a structured error instead of crashing — discovery should
+        # still work via the static `pipelines()` listing.
+        return {
+            "_error": (
+                f"diffusers.auto_pipeline import failed (likely a "
+                f"transformers/diffusers version mismatch in this env): {e}. "
+                f"Use action='pipelines' for the full taxonomy."
+            )
+        }
 
     def _names(m):
         return {family: cls.__name__ for family, cls in m.items()}

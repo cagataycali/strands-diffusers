@@ -173,6 +173,13 @@ def use_diffusers(
 
         if action == "tasks":
             t = registry.auto_pipeline_tasks()
+            if "_error" in t:
+                # Soft-fail: env-specific upstream issue, not a strands-diffusers bug.
+                return _ok(
+                    f"⚠️  AutoPipeline task discovery unavailable in this env:\n"
+                    f"   {t['_error']}",
+                    data=t,
+                )
             return _ok("🗂️  AutoPipeline task maps:\n" + json.dumps(t, indent=2), data=t)
 
         if action == "modalities":
@@ -394,15 +401,20 @@ def _coerce_param(value: Any) -> Any:
 
 
 def _infer_sample_rate(pipe: Any, default: int = 16000) -> int:
-    """Best-effort audio sample-rate discovery for pipelines that emit sound."""
-    for attr in ("sound_tokenizer", "vocoder", "audio_encoder"):
+    """Best-effort audio sample-rate discovery for pipelines that emit sound.
+
+    Checks, in order: dedicated audio components (vocoder/tokenizer/encoder), the
+    pipeline config, then the generative backbone (unet/transformer) — DanceDiffusion
+    stores sample_rate on its UNet1D, not the pipeline.
+    """
+    for attr in ("sound_tokenizer", "vocoder", "audio_encoder", "unet", "transformer"):
         comp = getattr(pipe, attr, None)
         cfg = getattr(comp, "config", None)
         sr = getattr(cfg, "sampling_rate", None) or getattr(cfg, "sample_rate", None)
         if sr:
             return int(sr)
     cfg = getattr(pipe, "config", None)
-    sr = getattr(cfg, "sampling_rate", None)
+    sr = getattr(cfg, "sampling_rate", None) or getattr(cfg, "sample_rate", None)
     return int(sr) if sr else default
 
 

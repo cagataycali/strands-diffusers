@@ -6,10 +6,11 @@ run fast on any machine — swap `model` for a full checkpoint to get real quali
 
 | example | what it shows | path used | model |
 |---|---|---|---|
-| `text_to_image.py` | text → image, image→png artifact | `run` | tiny-stable-diffusion-pipe |
-| `text_to_video.py` | text → video, video→mp4 artifact | `run` | tiny-random-ltx-video |
-| `cosmos_action_policy.py` | **WFM action-policy: video + robot ACTION out** | `call` + `run` | nvidia/Cosmos3-Nano |
-| `smoke.py` | fast E2E gate (discovery + img + video + action serializer) | all | tiny fixtures |
+| `text_to_image.py` | text to image, image to png artifact | `run` | tiny-stable-diffusion-pipe |
+| `text_to_video.py` | text to video, video to mp4 artifact | `run` | tiny-random-ltx-video |
+| `text_to_audio.py` | audio generation, audio to wav artifact | `run` | tiny DanceDiffusion (built in-process) |
+| `cosmos_action_policy.py` | WFM action-policy: video + robot action out | `call` + `run` | nvidia/Cosmos3-Nano |
+| `smoke.py` | E2E gate (discovery + img + video + audio + action) | all | tiny fixtures |
 
 ## run vs call
 

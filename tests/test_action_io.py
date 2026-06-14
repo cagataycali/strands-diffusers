@@ -195,3 +195,20 @@ def test_batched_images_each_saved():
         save_artifacts=True)
     arts = [a for a in out.get("artifacts", []) if a.endswith(".png")]
     assert len(arts) == 4 and len(set(arts)) == 4, f"batch lost images: {arts}"
+
+
+def test_sample_rate_inferred_from_backbone():
+    """Audio sample-rate must be read from the generative backbone (unet/transformer)
+    when the pipeline has no dedicated audio component. Regression: DanceDiffusion
+    stores sample_rate on its UNet1D, so .wav was silently written at the 16000
+    default instead of the model's real rate."""
+    from strands_diffusers.tools.use_diffusers import _infer_sample_rate
+
+    unet = type("UNet", (), {"config": type("Cfg", (), {"sample_rate": 22050})()})()
+    pipe = type("DanceDiffusionPipeline", (), {"unet": unet})()
+    assert _infer_sample_rate(pipe) == 22050
+    # transformer backbone with sampling_rate also works
+    tr = type("T", (), {"config": type("Cfg", (), {"sampling_rate": 44100})()})()
+    assert _infer_sample_rate(type("P", (), {"transformer": tr})()) == 44100
+    # no audio hints anywhere → default
+    assert _infer_sample_rate(type("P", (), {})()) == 16000

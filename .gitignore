@@ -19,3 +19,4 @@ strands_diffusers/_version.py
 build/
 .pytest_cache/
 __pycache__/
+*.bak
