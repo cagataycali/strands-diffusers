@@ -37,6 +37,7 @@ dependencies = [
     "pillow",
     "numpy",
     "accelerate",
+    "matplotlib",
 ]
 
 [project.optional-dependencies]

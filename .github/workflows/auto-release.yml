@@ -28,7 +28,7 @@ jobs:
     - name: Install build tooling
       run: |
         python -m pip install --upgrade pip
-        pip install build twine
+        pip install build twine packaging
 
     - name: Extract version from tag
       id: get_version
@@ -40,14 +40,25 @@ jobs:
     - name: Build package (version derived from git tag via setuptools-scm)
       run: python -m build
 
-    - name: Verify built version matches tag
+    - name: Verify built version matches tag (PEP440-normalized)
       run: |
         ls -l dist/
-        if ! ls dist/ | grep -q "${{ steps.get_version.outputs.version }}"; then
-          echo "::error::Built artifact does not match tag version ${{ steps.get_version.outputs.version }}"
-          ls dist/
-          exit 1
-        fi
+        python - "${{ steps.get_version.outputs.version }}" <<'EOF'
+        import sys, glob, os
+        from packaging.utils import parse_wheel_filename, parse_sdist_filename
+        from packaging.version import Version
+        tag = Version(sys.argv[1])                       # normalize the tag (v1.01 -> 1.1)
+        built = set()
+        for w in glob.glob("dist/*.whl"):
+            built.add(parse_wheel_filename(os.path.basename(w))[1])
+        for s in glob.glob("dist/*.tar.gz"):
+            built.add(parse_sdist_filename(os.path.basename(s))[1])
+        print("tag:", tag, "built:", sorted(map(str, built)))
+        if tag not in built:
+            print(f"::error::Built version(s) {sorted(map(str,built))} != tag {tag}")
+            sys.exit(1)
+        print(f"✅ built version matches tag {tag}")
+        EOF
 
     - name: Publish to PyPI
       env:

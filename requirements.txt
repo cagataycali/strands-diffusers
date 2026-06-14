@@ -5,3 +5,4 @@ torch
 pillow
 numpy
 accelerate
+matplotlib
