@@ -117,10 +117,11 @@ use_diffusers(action="run", pipeline="Cosmos3OmniPipeline", model="nvidia/Cosmos
 | `models` | every model class (VAEs, transformers, controlnets) |
 | `schedulers` | every scheduler class |
 | `tasks` | diffusers' `AutoPipeline` task → `{family: class}` maps |
-| `modalities` | pipelines grouped by modality (image / video / world / audio) |
+| `modalities` | pipelines grouped by modality (image / video / world / audio / **3d** mesh) |
 | `wfm` | world-foundation / action-capable pipelines (Cosmos, Wan, Hunyuan) |
 | `pipeline_info` | modality + `__call__` signature for one pipeline class |
 | `inspect` | signature + docstring of any target |
+| `visualize` | render a robot ACTION chunk → time-series + 3D trajectory + animation (mp4/gif) |
 | `cache` / `clear_cache` | manage loaded pipelines (free GPU memory) |
 
 ## Architecture
@@ -134,6 +135,20 @@ strands_diffusers/
 └── tools/
     └── use_diffusers.py   # the single @tool: run + call + discovery
 ```
+
+## Testing
+
+```bash
+pip install -e ".[video,audio,dev]"
+pytest tests/ -q          # 26 unit tests — no GPU, no model downloads
+python examples/smoke.py  # E2E gate on tiny HF fixtures
+```
+
+`tests/` covers the registry classifier (golden modalities + a guard that no
+video/WFM pipeline is ever mislabeled as a still image), and the multimodal I/O
+serializers — image, video (incl. `list[ndarray]`), **stereo audio** (channels-
+first *and* channels-last), the robot **action** chunk, and **3D mesh** output
+(ShapE → `.ply`/`.obj`/`.npz`). CI runs both on py3.10 + py3.12.
 
 ## License
 
