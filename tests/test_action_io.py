@@ -126,3 +126,20 @@ def test_parameters_accepts_json_string():
     bad = use_diffusers(action="inspect", target="utils.export_to_video",
                         parameters="not json at all")
     assert bad["status"] == "error" and "parameters" in bad["content"][0]["text"]
+
+
+def test_cached_reference_threading():
+    """The flagship Cosmos pattern: call->cache a condition, then thread it into a
+    later call's parameters as 'cached:key'. Must resolve to the LIVE object at
+    every nesting level (dict / list / scalar) and via the '**' unpack key."""
+    import importlib
+    from strands_diffusers.core import engine
+    m = importlib.import_module("strands_diffusers.tools.use_diffusers")
+    sentinel = object()
+    engine._CACHE["cond"] = sentinel
+    assert m._coerce_param({"action": "cached:cond"})["action"] is sentinel
+    assert m._coerce_param(["cached:cond", "x"])[0] is sentinel
+    assert m._coerce_param("cached:cond") is sentinel
+    engine._CACHE["bundle"] = {"a": 1, "b": 2}
+    assert m._resolve_target("cached:bundle") == {"a": 1, "b": 2}
+    engine.cache_clear("cond"); engine.cache_clear("bundle")
