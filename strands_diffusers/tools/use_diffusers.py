@@ -220,6 +220,8 @@ def use_diffusers(
             if act is None and target:
                 if target.startswith("cached:"):
                     act = _resolve_target(target)
+                elif target.lstrip().startswith("["):
+                    act = json.loads(target)          # inline JSON action
                 else:
                     with open(target) as f:
                         act = json.load(f)

@@ -101,3 +101,15 @@ def test_stereo_audio_downmix_both_layouts():
             save_artifacts=False)
         samples = out["result"]["audio"]["samples"]
         assert samples == N, f"{shape} -> {samples} samples (expected {N})"
+
+
+def test_visualize_accepts_json_string_action():
+    """LLM tool-calls serialize list inputs to a JSON STRING. visualize must parse
+    it (via inputs OR target), not crash in np.asarray(str). Regression: an agent
+    needed 11 failed tool calls because inputs arrived stringified."""
+    from strands_diffusers import use_diffusers
+    js = "[[[0.1,0,0,0,0,0,-1],[0.5,0,0,0,0,0,1]]]"
+    for via in ("inputs", "target"):
+        r = use_diffusers(action="visualize", parameters={"fps": 5}, **{via: js})
+        assert r["status"] == "success", f"{via}: {r['content'][0]['text'][:120]}"
+        assert len(r.get("artifacts", [])) >= 2
