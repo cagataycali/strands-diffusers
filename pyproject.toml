@@ -49,6 +49,7 @@ mcp = ["strands-mcp-server"]
 all = ["strands-diffusers[video,audio,dev,mcp]"]
 
 [project.scripts]
+strands-diffusers = "strands_diffusers.mcp:main"
 strands-diffusers-mcp = "strands_diffusers.mcp:main"
 
 [project.urls]

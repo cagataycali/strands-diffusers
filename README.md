@@ -198,16 +198,25 @@ MIT
 
 ## MCP Server (Claude Code / Claude Desktop / Cursor / any MCP client)
 
-```bash
-pip install "strands-diffusers[mcp]"
+No install needed — just `uvx`:
 
-strands-diffusers-mcp                    # stdio (Claude Code / Desktop)
-strands-diffusers-mcp --http --port 8020 # HTTP multi-client
+```bash
+uvx strands-diffusers                    # stdio (Claude Code / Desktop)
+uvx strands-diffusers --http --port 8020 # HTTP multi-client
 ```
 
-**Claude Code:** `claude mcp add diffusers -- strands-diffusers-mcp`
+**Claude Code:** `claude mcp add diffusers -- uvx strands-diffusers`
 
 **Claude Desktop:**
 ```json
-{"mcpServers": {"diffusers": {"command": "strands-diffusers-mcp"}}}
+{"mcpServers": {"diffusers": {"command": "uvx", "args": ["strands-diffusers"]}}}
 ```
+
+<details>
+<summary>Prefer pip?</summary>
+
+```bash
+pip install "strands-diffusers[mcp]"
+strands-diffusers-mcp
+```
+</details>
