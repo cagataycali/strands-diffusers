@@ -153,6 +153,33 @@ use_diffusers(action="run", pipeline="Cosmos3OmniPipeline", model="nvidia/Cosmos
               dtype="bfloat16", device="cuda")
 ```
 
+## MCP server
+
+Use it from **Claude Code, Claude Desktop, Cursor, or any MCP client** — same tool, over MCP.
+
+No install needed — just `uvx`:
+
+```bash
+uvx strands-diffusers                    # stdio (Claude Code / Desktop)
+uvx strands-diffusers --http --port 8020 # HTTP multi-client
+```
+
+**Claude Code:** `claude mcp add diffusers -- uvx strands-diffusers`
+
+**Claude Desktop:**
+```json
+{"mcpServers": {"diffusers": {"command": "uvx", "args": ["strands-diffusers"]}}}
+```
+
+<details>
+<summary>Prefer pip?</summary>
+
+```bash
+pip install "strands-diffusers[mcp]"
+strands-diffusers-mcp
+```
+</details>
+
 ## Discovery
 
 | action | returns |
@@ -194,29 +221,6 @@ python examples/generate_docs_assets.py
 — quickstart, full gallery (images / video / audio / actions / 3D), the
 world-foundation-model story, discovery, and the two-layer design.
 
+## License
+
 MIT
-
-## MCP Server (Claude Code / Claude Desktop / Cursor / any MCP client)
-
-No install needed — just `uvx`:
-
-```bash
-uvx strands-diffusers                    # stdio (Claude Code / Desktop)
-uvx strands-diffusers --http --port 8020 # HTTP multi-client
-```
-
-**Claude Code:** `claude mcp add diffusers -- uvx strands-diffusers`
-
-**Claude Desktop:**
-```json
-{"mcpServers": {"diffusers": {"command": "uvx", "args": ["strands-diffusers"]}}}
-```
-
-<details>
-<summary>Prefer pip?</summary>
-
-```bash
-pip install "strands-diffusers[mcp]"
-strands-diffusers-mcp
-```
-</details>
