@@ -195,3 +195,19 @@ python examples/generate_docs_assets.py
 world-foundation-model story, discovery, and the two-layer design.
 
 MIT
+
+## MCP Server (Claude Code / Claude Desktop / Cursor / any MCP client)
+
+```bash
+pip install "strands-diffusers[mcp]"
+
+strands-diffusers-mcp                    # stdio (Claude Code / Desktop)
+strands-diffusers-mcp --http --port 8020 # HTTP multi-client
+```
+
+**Claude Code:** `claude mcp add diffusers -- strands-diffusers-mcp`
+
+**Claude Desktop:**
+```json
+{"mcpServers": {"diffusers": {"command": "strands-diffusers-mcp"}}}
+```

@@ -45,7 +45,11 @@ video = ["imageio[ffmpeg]", "opencv-python", "av"]
 audio = ["soundfile", "librosa"]
 cosmos = ["cosmos_guardrail"]
 dev = ["pytest>=7.0", "black", "ruff"]
-all = ["strands-diffusers[video,audio,dev]"]
+mcp = ["strands-mcp-server"]
+all = ["strands-diffusers[video,audio,dev,mcp]"]
+
+[project.scripts]
+strands-diffusers-mcp = "strands_diffusers.mcp:main"
 
 [project.urls]
 Homepage = "https://github.com/cagataycali/strands-diffusers"
